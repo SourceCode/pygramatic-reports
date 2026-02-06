@@ -5,7 +5,11 @@
 1.  **Fork & Clone**: Standard GitHub flow.
 2.  **Environment**: Use `hatch` or `venv` to set up dependencies.
 3.  **Branching**: Use feature branches `feature/my-feature`.
-4.  **Commits**: Use conventional commits (e.g., `feat: add new chart type`).
+4.  **Commits**: Use **Conventional Commits** to enable automated semantic versioning.
+    - `feat: ...` -> Minor version bump (1.1.0)
+    - `fix: ...` -> Patch version bump (1.0.1)
+    - `feat!: ...` or `BREAKING CHANGE: ...` -> Major version bump (2.0.0)
+    - `docs:`, `style:`, `refactor:`, `test:`, `chore:` -> No version bump
 
 ## Standards
 

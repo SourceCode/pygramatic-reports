@@ -293,3 +293,18 @@ skips = ["B101"]  # assert is fine in non-test code for invariants
 min_confidence = 80
 paths = ["src/pygramattic_reports"]
 exclude = ["tests/"]
+
+# =============================================================================
+# Semantic Release
+# =============================================================================
+
+[tool.semantic_release]
+version_variable = [
+    "src/pygramattic_reports/__init__.py:__version__",
+    "pyproject.toml:project.version"
+]
+version_toml = ["pyproject.toml:project.version"]
+branch = "main"
+upload_to_pypi = false
+upload_to_release = true
+build_command = "pip install build && python -m build"
