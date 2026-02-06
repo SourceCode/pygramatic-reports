@@ -178,6 +178,13 @@ class FeedbackError(PygramatticError):
         super().__init__(message, error_code="FEEDBACK_ERROR", **kwargs)
 
 
+class DataError(PygramatticError):
+    """Data processing failed."""
+
+    def __init__(self, message: str, **kwargs: Any) -> None:  # noqa: D107
+        super().__init__(message, error_code="DATA_ERROR", **kwargs)
+
+
 class OutputError(PygramatticError):
     """Output rendering/writing failed."""
 

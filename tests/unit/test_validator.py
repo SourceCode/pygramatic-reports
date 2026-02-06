@@ -75,11 +75,15 @@ def _make_template(
 
         section_specs = [
             TemplateSectionSpec(
-                type="title", source=SectionSource.STATIC, content="Test",
+                type="title",
+                source=SectionSource.STATIC,
+                content="Test",
             ),
             TemplateSectionSpec(
-                type="data_table", source=SectionSource.DATA,
-                title="Data", dataset="main",
+                type="data_table",
+                source=SectionSource.DATA,
+                title="Data",
+                dataset="main",
             ),
         ]
     return TemplateSpec(name="test", sections=section_specs)
@@ -141,9 +145,11 @@ class TestStructuralMissingSection:
     """Fail when section is missing."""
 
     def test_missing_section_fails(self) -> None:
-        report = _make_report(sections=[
-            ReportSection(section_type=SectionType.TITLE, content="Title"),
-        ])
+        report = _make_report(
+            sections=[
+                ReportSection(section_type=SectionType.TITLE, content="Title"),
+            ]
+        )
         template = _make_template()  # expects 2 sections
         checks = StructuralValidator().validate(report, template)
 
@@ -174,16 +180,20 @@ class TestStructuralDataTableEmpty:
     """Fail for empty table."""
 
     def test_empty_table_fails(self) -> None:
-        report = _make_report(sections=[
-            ReportSection(
-                section_type=SectionType.DATA_TABLE,
-                title="Empty",
-                table_data={"headers": [], "rows": []},
-            ),
-        ])
-        template = _make_template(section_specs=[
-            TemplateSectionSpec(type="data_table", title="Empty"),
-        ])
+        report = _make_report(
+            sections=[
+                ReportSection(
+                    section_type=SectionType.DATA_TABLE,
+                    title="Empty",
+                    table_data={"headers": [], "rows": []},
+                ),
+            ]
+        )
+        template = _make_template(
+            section_specs=[
+                TemplateSectionSpec(type="data_table", title="Empty"),
+            ]
+        )
         checks = StructuralValidator().validate(report, template)
 
         table_checks = [c for c in checks if "data_table_content" in c.check_name]
@@ -198,17 +208,21 @@ class TestStructuralChartHasImage:
     """Pass for chart with image data."""
 
     def test_chart_with_image_passes(self) -> None:
-        report = _make_report(sections=[
-            ReportSection(
-                section_type=SectionType.CHART,
-                title="Chart",
-                media_bytes=b"\x89PNG\r\n\x1a\n",
-                media_type="image/png",
-            ),
-        ])
-        template = _make_template(section_specs=[
-            TemplateSectionSpec(type="chart", title="Chart"),
-        ])
+        report = _make_report(
+            sections=[
+                ReportSection(
+                    section_type=SectionType.CHART,
+                    title="Chart",
+                    media_bytes=b"\x89PNG\r\n\x1a\n",
+                    media_type="image/png",
+                ),
+            ]
+        )
+        template = _make_template(
+            section_specs=[
+                TemplateSectionSpec(type="chart", title="Chart"),
+            ]
+        )
         checks = StructuralValidator().validate(report, template)
 
         chart_checks = [c for c in checks if "chart_image" in c.check_name]
@@ -372,13 +386,15 @@ class TestNarrativeValid:
             {"valid": True, "issues": []},
         )
 
-        report = _make_report(sections=[
-            ReportSection(
-                section_type=SectionType.SUMMARY,
-                title="Summary",
-                content="Revenue is growing across all regions.",
-            ),
-        ])
+        report = _make_report(
+            sections=[
+                ReportSection(
+                    section_type=SectionType.SUMMARY,
+                    title="Summary",
+                    content="Revenue is growing across all regions.",
+                ),
+            ]
+        )
         ds = _make_dataset()
         checks = NarrativeValidator(client).validate(report, {"main": ds})
 
@@ -395,18 +411,22 @@ class TestNarrativeIssues:
     def test_narrative_issues_warns(self) -> None:
         client = MagicMock()
         client.is_available.return_value = True
-        client.generate.return_value = json.dumps({
-            "valid": False,
-            "issues": ["Revenue trend is overstated"],
-        })
+        client.generate.return_value = json.dumps(
+            {
+                "valid": False,
+                "issues": ["Revenue trend is overstated"],
+            }
+        )
 
-        report = _make_report(sections=[
-            ReportSection(
-                section_type=SectionType.NARRATIVE,
-                title="Analysis",
-                content="Revenue is skyrocketing.",
-            ),
-        ])
+        report = _make_report(
+            sections=[
+                ReportSection(
+                    section_type=SectionType.NARRATIVE,
+                    title="Analysis",
+                    content="Revenue is skyrocketing.",
+                ),
+            ]
+        )
         ds = _make_dataset()
         checks = NarrativeValidator(client).validate(report, {"main": ds})
 
@@ -423,7 +443,8 @@ class TestNarrativeAiUnavailable:
 
     def test_skips_without_client(self) -> None:
         checks = NarrativeValidator(None).validate(
-            _make_report(), {"main": _make_dataset()},
+            _make_report(),
+            {"main": _make_dataset()},
         )
         assert len(checks) == 1
         assert checks[0].status == CheckStatus.SKIP
@@ -432,7 +453,8 @@ class TestNarrativeAiUnavailable:
         client = MagicMock()
         client.is_available.return_value = False
         checks = NarrativeValidator(client).validate(
-            _make_report(), {"main": _make_dataset()},
+            _make_report(),
+            {"main": _make_dataset()},
         )
         assert checks[0].status == CheckStatus.SKIP
 
@@ -441,14 +463,17 @@ class TestNarrativeAiUnavailable:
         client.is_available.return_value = True
         client.generate.side_effect = AIError("Connection failed")
 
-        report = _make_report(sections=[
-            ReportSection(
-                section_type=SectionType.SUMMARY,
-                content="Some text",
-            ),
-        ])
+        report = _make_report(
+            sections=[
+                ReportSection(
+                    section_type=SectionType.SUMMARY,
+                    content="Some text",
+                ),
+            ]
+        )
         checks = NarrativeValidator(client).validate(
-            report, {"main": _make_dataset()},
+            report,
+            {"main": _make_dataset()},
         )
         assert checks[0].status == CheckStatus.SKIP
 
@@ -526,13 +551,17 @@ class TestValidatorWithWarning:
                 ),
             ],
         )
-        template = _make_template(section_specs=[
-            TemplateSectionSpec(type="title", content="Title"),
-            TemplateSectionSpec(type="chart", title="Chart"),
-        ])
+        template = _make_template(
+            section_specs=[
+                TemplateSectionSpec(type="title", content="Title"),
+                TemplateSectionSpec(type="chart", title="Chart"),
+            ]
+        )
 
         result = ReportValidator().validate(
-            report, template, {"main": _make_dataset()},
+            report,
+            template,
+            {"main": _make_dataset()},
         )
 
         assert result.warnings >= 1

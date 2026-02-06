@@ -2,127 +2,83 @@
 
 > Unified Python Report Processing & Generation Tool
 
-A comprehensive, clonable Python-based tool that ingests data from many sources, normalizes it, processes it, and generates consistent, validated, and well-styled reports across multiple output formats.
+A comprehensive, declarative reporting engine for Python that ingests data from standard sources (CSV, Excel, JSON), validates it, processes it (joins, filters, aggregates), and generates publication-quality verified reports in HTML, PDF, and PowerPoint formats.
 
-## Key Capabilities
+## 🚀 Key Capabilities
 
-*   **Universal Ingestion**: Support for JSON, CSV, Excel, DOCX, Google Docs, Sheets, and Slides.
-*   **Strict Normalization**: All inputs are normalized to a canonical JSON schema before processing.
-*   **Template-Driven**: Jinja2-based templating engine for consistent report structure.
-*   **Publication-Quality Charts**: Integrated Matplotlib, Seaborn, and Plotly support.
-*   **Validation Guarantee**: Automated verification of report content against source data.
-*   **Feedback Loops**: AI-driven analysis of manual edits to improve future generation.
+*   **Declarative Templates**: Define report structure and logic in simple YAML.
+*   **Data Pipeline**: Built-in filtering, joins, sorting, and aggregation (no code required).
+*   **Strict Validation**: Enforce data quality rules (uniqueness, completeness) before rendering.
+*   **Advanced Charts**: 15+ chart types including Waterfall, Sankey, and Gauges via Matplotlib/Seaborn.
+*   **Theming**: Separate content from style with robust theme definitions (Color, Typography, CSS).
+*   **Multi-Format**: Export to HTML, Markdown, and PowerPoint.
 
-## Architecture Summary
+## 🏗 Architecture Summary
 
-The system follows a strict linear pipeline:
+Pygramattic follows a linear compilation pipeline:
 
-`Inputs` → `Loaders` → `Normalizers` → `Processors` → `Builders` → `Validators` → `Outputs`
+1.  **Loader**: Ingests raw data into Pandas DataFrames.
+2.  **Builder**: Resolves the YAML template and applies the Theme.
+3.  **Processor**: Executes data transformations (Joins, Filters) and Validation rules.
+4.  **Renderer**: Generates visualizations and final artifacts using format adapters.
 
-*   **Loaders**: Handle file I/O and external API authentication.
-*   **Normalizers**: Standardize disparate input formats.
-*   **Processors**: Apply business logic and transformations.
-*   **Builders**: Assemble the final report using templates and themes.
-*   **Validators**: Ensure data integrity in the final output.
+[Read the full Architecture Guide](/docs/implementation.md).
 
-See [Architecture & Implementation](/docs/implementation.md) for deeper details.
-
-## Tech Stack
+## 🛠 Tech Stack
 
 *   **Runtime**: Python 3.11+
-*   **Core Framework**: Pydantic 2.0+ (Validation), Pandas 2.0+ (Data Processing)
-*   **CLI**: Typer + Rich
-*   **Visualization**: Matplotlib, Seaborn, OpenPyXL
-*   **Templating**: Jinja2, Mistune
-*   **Linting/Quality**: Ruff, MyPy (Strict)
+*   **Core**: Pydantic 2.0, Pandas 2.0, Jinja2
+*   **Vis**: Matplotlib 3.7+, Seaborn
+*   **CLI**: Typer, Rich
+*   **Quality**: MyPy (Strict), Ruff, Pytest
 
-## Quick Start
-
-### Prerequisites
-*   Python 3.11 or higher
-*   `hatch` (recommended) or `pip`
+## ⚡ Quick Start
 
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/pygramattic-reports.git
-cd pygramattic-reports
-
-# Install dependencies
-pip install -e ".[dev,all]"
+pip install pygramattic-reports
 ```
 
-### Running Your First Report
+### Create Your First Report
 
 ```bash
-# Initialize a new project structure
-report init my-first-report
-cd my-first-report
+# 1. Initialize project
+report init my-report
+cd my-report
 
-# Ingest sample data
-report ingest ./data/sample.csv
+# 2. Add data
+echo "category,value\nA,10\nB,20" > data.csv
 
-# Build the report
+# 3. Build
 report build --config config.yaml
 ```
 
-See [Installation Guide](/docs/install.md) and [First Run](/docs/first-run.md) for more details.
+See the [First Run Guide](/docs/first-run.md) for a complete walkthrough.
 
-## Configuration
-
-Configuration is managed via YAML files and environment variables.
-
-Example `.env`:
-```bash
-GOOGLE_APPLICATION_CREDENTIALS="path/to/credentials.json"
-LOG_LEVEL="INFO"
-DATA_DIR="./data"
-```
-
-See [Setup Guide](/docs/setup.md) for full configuration details.
-
-## Testing & Coverage
-
-We enforce strict test coverage and type safety.
-
-```bash
-# Run unit tests
-pytest tests/unit
-
-# Run full suite with coverage
-pytest --cov=src/pygramattic_reports tests/
-```
-
-See [Testing Guide](/docs/testing.md) and [Coverage Report](/docs/coverage.md).
-
-## Documentation Index
+## 📚 Documentation Index
 
 ### Core
-*   [Documentation Hub](/docs/README.md)
 *   [Installation](/docs/install.md)
-*   [Setup & Configuration](/docs/setup.md)
-*   [First Run Guide](/docs/first-run.md)
+*   [Setup & Config](/docs/setup.md)
+*   [User Guide](/docs/user_guide.md)
 
 ### Technical
-*   [Functionality & Workflows](/docs/functionality.md)
+*   [Functionality](/docs/functionality.md)
 *   [Data Schema](/docs/schema.md)
 *   [API Reference](/docs/api.md)
 *   [Integrations](/docs/integrations.md)
-*   [Implementation Details](/docs/implementation.md)
 
-### Operational
+### Ops & Quality
 *   [Testing Strategy](/docs/testing.md)
 *   [Code Coverage](/docs/coverage.md)
+*   [Security](/docs/security.md)
 *   [Troubleshooting](/docs/troubleshooting.md)
-*   [Security & Auth](/docs/security.md)
-*   [Contributing](/docs/contributing.md)
-*   [Changelog](/docs/changelog.md)
 
-## Contributing
+## 🤝 Contributing
 
-We welcome contributions! Please see [Contributing Guide](/docs/contributing.md) for our workflow, style guide, and review process.
+We welcome contributions! Please read our [Contributing Guide](/docs/contributing.md) to get started.
 
-## License
+## 📄 License
 
-MIT License. See `pyproject.toml` for details.
+MIT License.

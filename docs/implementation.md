@@ -1,61 +1,46 @@
 # Architecture & Implementation
 
-## Repository Structure
-
-The codebase is organized as a standard Python package structure.
+## Repository Layout
 
 ```text
-src/
-  pygramattic_reports/
-    __init__.py
-    cli/            # Typer CLI commands
-    config/         # Configuration loading logic
-    loaders/        # Input adapters (CSV, Google, etc.)
-    models/         # Pydantic data models
-    normalizers/    # Data standardization logic
-    processors/     # Pandas data transformation
-    storage/        # Filesystem management
-    templates/      # Jinja2 template engine
-    validator/      # Logic for validating outputs
+src/pygramattic_reports/
+├── api.py              # Fluent API entry point
+├── builder/            # Orchestrates Report assembly
+├── charys/             # Visualization engines (Matplotlib/Seaborn)
+├── cli/                # Typer CLI commands
+├── config/             # Pydantic settings management
+├── core/               # Shared logic (Lazy Loading, Caching)
+├── loaders/            # File I/O adapters
+├── models/             # Pydantic data models (Schema)
+├── outputs/            # Renderers (HTML, PDF, etc.)
+├── processors/         # Data transformation logic
+├── templates/          # Jinja2 loader & renderer
+└── themes/             # Style management
 ```
 
-## Key Design Patterns
+## Key Subsystems
 
-### 1. Adapter Pattern (Loaders)
-We use a registry-based Adapter pattern for Loaders. All loaders inherit from `BaseLoader` and must implement `load(source) -> RawData`. New loaders can be registered at runtime.
+### 1. The Builder Pattern
+The `ReportBuilder` class is the heart of the system. It:
+1.  Resolves the `TemplateSpec`.
+2.  Iterates `template.sections`.
+3.  Dispatches each to a specific `SectionProcessor`.
+4.  Accumulates results in a `Report` object.
 
-### 2. Pipeline Pattern (Build Process)
-The build process is a linear pipeline. Data flows through a series of distinct stages, each transforming the input into a more refined state. This ensures testability of each stage in isolation.
+This separation allows for a multi-pass architecture where we can validate claims (numbers) against the source data *after* generation but *before* rendering.
 
-```python
-# Conceptual Flow
-pipeline = Pipeline([
-    LoaderStage(),
-    NormalizerStage(),
-    ProcessorStage(),
-    RendererStage()
-])
-pipeline.run(config)
-```
+### 2. Data Flow
+`Input File` -> `Loader` -> `DataFrame` -> `DataProcessor (Filter/Join)` -> `ChartEngine` -> `Image Bytes` -> `ReportSection` -> `OutputAdapter` -> `File`
 
-### 3. Repository Pattern (Storage)
-The `storage` module abstracts physical file system access. This allows swapping local storage for S3 or other cloud storage solutions in the future without changing core logic.
+### 3. Verification Claims
+To ensure correctness, the system generates `NumberClaim` objects during processing.
+*   **Concept**: When a number is rendered in a table, a claim is created: *"Value 100.5 appeared in row 0 column 'amount' derived from dataset 'sales'"*.
+*   **Validator**: (Planned Phase) Re-checks these claims against the raw dataframe sum/count to ensure rendering didn't corrupt the data.
 
-## State Management
+### 4. Component Styling
+The `ThemeApplicator` converts the high-level YAML theme into:
+1.  CSS Variables (for HTML).
+2.  Matplotlib `rcParsms` (for Charts).
+3.  PPTX Slide Master layouts (for PowerPoint).
 
-The application is largely stateless.
-*   **Config**: Loaded at startup.
-*   **Data**: Passed explicitly between functions.
-*   **State Persistence**: Handled via file system artifacts in `data/` (intermediate files serve as checkpoints).
-
-## Observability
-
-We use `structlog` for structured JSON logging.
-*   **Logs**: Written to `stdout` (CLI) and optional log files.
-*   **Levels**: `INFO` for standard operations, `DEBUG` for detailed trace data.
-
-## Deployment
-
-The application is designed to be deployed as a Docker container or a standalone CLI tool.
-*   **Docker**: A `Dockerfile` is provided for containerized execution.
-*   **CI/CD**: GitHub Actions workflow builds wheels and runs tests on push.
+This ensures visual consistency across disparate output media.

@@ -156,26 +156,32 @@ class ReportDiffer:
         def _flush() -> None:
             """Flush buffered additions/removals into entries."""
             if removed_buf and added_buf:
-                entries.append(DiffEntry(
-                    section=current_section,
-                    change_type="modified",
-                    original="\n".join(removed_buf),
-                    edited="\n".join(added_buf),
-                ))
+                entries.append(
+                    DiffEntry(
+                        section=current_section,
+                        change_type="modified",
+                        original="\n".join(removed_buf),
+                        edited="\n".join(added_buf),
+                    )
+                )
             elif removed_buf:
-                entries.append(DiffEntry(
-                    section=current_section,
-                    change_type="removed",
-                    original="\n".join(removed_buf),
-                    edited="",
-                ))
+                entries.append(
+                    DiffEntry(
+                        section=current_section,
+                        change_type="removed",
+                        original="\n".join(removed_buf),
+                        edited="",
+                    )
+                )
             elif added_buf:
-                entries.append(DiffEntry(
-                    section=current_section,
-                    change_type="added",
-                    original="",
-                    edited="\n".join(added_buf),
-                ))
+                entries.append(
+                    DiffEntry(
+                        section=current_section,
+                        change_type="added",
+                        original="",
+                        edited="\n".join(added_buf),
+                    )
+                )
             removed_buf.clear()
             added_buf.clear()
 

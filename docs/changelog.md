@@ -2,21 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
 ## [Unreleased]
 
 ### Added
-*   Initial project scaffolding.
-*   Core CLI structure (`init`, `ingest`, `build`).
-*   Loaders for CSV, JSON, and Google integrations.
-*   Standard documentation suite.
+- **Data Joins**: Ability to merge multiple datasets in templates.
+- **Data Validation**: Rules for completeness, uniqueness, and ranges.
+- **Advanced Tables**: Totals rows and conditional formatting.
+- **Lazy Loading**: Improved memory performance for large datasets.
+- **Charts**: New chart types (Waterfall, Sankey, Gauge).
 
-### Fixed
-*   N/A
+### Changed
+- Standardized CSS variable generation in Themes.
+- Improved HTML template structure.
 
-## [0.1.0] - 2026-02-06
-
-### Added
-*   Initial release.
+## [0.1.0] - Initial Beta
+- Core functionality: Loaders, Builder, Charts, HTML Export.

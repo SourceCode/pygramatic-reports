@@ -199,16 +199,10 @@ def _parse_table_token(
 
     for child in token.get("children", []):
         if child.get("type") == "table_head":
-            headers = [
-                _extract_text(cell).strip()
-                for cell in child.get("children", [])
-            ]
+            headers = [_extract_text(cell).strip() for cell in child.get("children", [])]
         elif child.get("type") == "table_body":
             for row_token in child.get("children", []):
-                values = [
-                    _extract_text(cell).strip()
-                    for cell in row_token.get("children", [])
-                ]
+                values = [_extract_text(cell).strip() for cell in row_token.get("children", [])]
                 rows.append(dict(zip(headers, values, strict=False)))
 
     return rows, headers

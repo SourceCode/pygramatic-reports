@@ -39,6 +39,8 @@ _SECTION_TYPE_MAP: dict[str, SectionType] = {
     "narrative": SectionType.NARRATIVE,
     "title": SectionType.TITLE,
     "heading": SectionType.HEADING,
+    "insight": SectionType.NARRATIVE,
+    "anomaly": SectionType.NARRATIVE,
 }
 
 
@@ -139,6 +141,12 @@ class AISectionProcessor:
         if spec.type == "narrative":
             return self._build_narrative_prompt(spec, dataset)
 
+        if spec.type == "insight":
+            return self._build_insight_prompt(spec, dataset)
+
+        if spec.type == "anomaly":
+            return self._build_anomaly_prompt(spec, dataset)
+
         return f"Write content for a {spec.type} section."
 
     def _build_summary_prompt(
@@ -151,7 +159,9 @@ class AISectionProcessor:
         key_stats = ""
         if dataset:
             data_desc = format_data_description(
-                dataset.name, dataset.column_names, dataset.row_count,
+                dataset.name,
+                dataset.column_names,
+                dataset.row_count,
             )
             key_stats = self._compute_key_stats(dataset)
         return SUMMARY_PROMPT.format(
@@ -177,6 +187,42 @@ class AISectionProcessor:
             data_context=data_context,
             additional_context=spec.ai_context or "",
             max_words=spec.ai_max_words or 300,
+        )
+
+    def _build_insight_prompt(
+        self,
+        spec: TemplateSectionSpec,
+        dataset: Dataset | None,
+    ) -> str:
+        """Build prompt for insight-type sections."""
+        from pygramattic_reports.ai.prompts import INSIGHT_PROMPT
+
+        data_context = ""
+        if dataset:
+            data_context = self._format_sample_data(dataset)
+        return INSIGHT_PROMPT.format(
+            topic=spec.title or "Key Insights",
+            data_context=data_context,
+            additional_context=spec.ai_context or "",
+            max_words=spec.ai_max_words or 200,
+        )
+
+    def _build_anomaly_prompt(
+        self,
+        spec: TemplateSectionSpec,
+        dataset: Dataset | None,
+    ) -> str:
+        """Build prompt for anomaly-type sections."""
+        from pygramattic_reports.ai.prompts import ANOMALY_PROMPT
+
+        data_context = ""
+        if dataset:
+            data_context = self._format_sample_data(dataset)
+        return ANOMALY_PROMPT.format(
+            topic=spec.title or "Anomaly Detection",
+            data_context=data_context,
+            additional_context=spec.ai_context or "",
+            max_words=spec.ai_max_words or 200,
         )
 
     def _build_context(self, dataset: Dataset | None) -> str:
@@ -216,7 +262,9 @@ class AISectionProcessor:
 
         if spec.type == "summary":
             return generate_fallback_summary(
-                dataset, self.report_name, spec.ai_max_words or 200,
+                dataset,
+                self.report_name,
+                spec.ai_max_words or 200,
             )
         return generate_fallback_narrative(dataset, spec.title or "")
 

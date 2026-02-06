@@ -26,7 +26,9 @@ class OutputRegistry:
         self._adapters: dict[str, BaseOutputAdapter] = {}
 
     def register(
-        self, format_name: str, adapter: BaseOutputAdapter,
+        self,
+        format_name: str,
+        adapter: BaseOutputAdapter,
     ) -> None:
         """Register an adapter for a format name.
 
@@ -51,10 +53,7 @@ class OutputRegistry:
         adapter = self._adapters.get(format_name)
         if adapter is None:
             available = ", ".join(sorted(self._adapters))
-            msg = (
-                f"No adapter for format {format_name!r}. "
-                f"Available: {available}"
-            )
+            msg = f"No adapter for format {format_name!r}. Available: {available}"
             raise ValueError(msg)
         return adapter
 

@@ -42,10 +42,7 @@ class XlsxAdapter(BaseOutputAdapter):
         wb = Workbook()
         ws: Any = wb.active
 
-        tables = [
-            s for s in report.sections
-            if s.section_type == SectionType.DATA_TABLE
-        ]
+        tables = [s for s in report.sections if s.section_type == SectionType.DATA_TABLE]
 
         if not tables:
             ws.title = "No Data"

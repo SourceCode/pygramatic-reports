@@ -80,9 +80,7 @@ def ingest(
     # Detect format
     source_type_str = format or _detect_format(path)
     if source_type_str is None:
-        console.print(
-            f"[red]Error:[/red] Cannot detect format for {path.suffix!r}. Use --format."
-        )
+        console.print(f"[red]Error:[/red] Cannot detect format for {path.suffix!r}. Use --format.")
         raise typer.Exit(code=1)
 
     try:
@@ -120,8 +118,7 @@ def ingest(
     if not quiet:
         row_info = f", {raw_data.row_count} rows" if raw_data.row_count else ""
         console.print(
-            f"[green]\u2713[/green] Loaded: {path.name}"
-            f" ({source_type_str.upper()}{row_info})"
+            f"[green]\u2713[/green] Loaded: {path.name} ({source_type_str.upper()}{row_info})"
         )
 
     # Normalize
@@ -132,9 +129,7 @@ def ingest(
         raise typer.Exit(code=1) from None
 
     if not quiet:
-        console.print(
-            f"[green]\u2713[/green] Normalized: {len(dataset.schema)} columns detected"
-        )
+        console.print(f"[green]\u2713[/green] Normalized: {len(dataset.schema)} columns detected")
 
     # Save
     app_config = _load_app_config(ctx)
@@ -148,14 +143,8 @@ def ingest(
         raise typer.Exit(code=1) from None
 
     if not quiet:
-        save_dir = (
-            app_config.storage.data_dir
-            / app_config.storage.processed_dir
-            / dataset.id
-        )
-        console.print(
-            f"[green]\u2713[/green] Saved: dataset {dataset.id[:8]} \u2192 {save_dir}"
-        )
+        save_dir = app_config.storage.data_dir / app_config.storage.processed_dir / dataset.id
+        console.print(f"[green]\u2713[/green] Saved: dataset {dataset.id[:8]} \u2192 {save_dir}")
         _print_schema_table(dataset)
 
 

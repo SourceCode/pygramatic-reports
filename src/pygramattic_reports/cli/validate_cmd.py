@@ -33,16 +33,23 @@ console = Console()
 def validate(
     ctx: typer.Context,
     report_id: str = typer.Argument(
-        ..., help="Report ID from storage",
+        ...,
+        help="Report ID from storage",
     ),
     strict: bool = typer.Option(
-        False, "--strict", help="Fail on warnings too",
+        False,
+        "--strict",
+        help="Fail on warnings too",
     ),
     no_ai: bool = typer.Option(
-        False, "--no-ai", help="Skip AI-assisted narrative validation",
+        False,
+        "--no-ai",
+        help="Skip AI-assisted narrative validation",
     ),
     output: str | None = typer.Option(
-        None, "--output", "-o",
+        None,
+        "--output",
+        "-o",
         help="Save validation report to file (JSON)",
     ),
 ) -> None:
@@ -62,14 +69,18 @@ def validate(
         raise typer.Exit(code=1)
 
     template, datasets = _load_build_artifacts(
-        build_log_data, app_config, storage,
+        build_log_data,
+        app_config,
+        storage,
     )
     if template is None:
         console.print("[red]Error:[/red] Could not load template from build log")
         raise typer.Exit(code=1)
 
     report = _build_report_for_validation(
-        build_log_data, app_config, storage,
+        build_log_data,
+        app_config,
+        storage,
     )
     if report is None:
         console.print("[red]Error:[/red] Could not rebuild report for validation")

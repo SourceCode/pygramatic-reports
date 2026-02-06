@@ -29,10 +29,7 @@ class TestFullPipelineCsvToValidatedReport:
         # 1. Create test CSV data
         csv_path = tmp_path / "sales.csv"
         csv_path.write_text(
-            "region,revenue,cost,profit\n"
-            "US,1500,800,700\n"
-            "EU,2300,1100,1200\n"
-            "APAC,890,500,390\n"
+            "region,revenue,cost,profit\nUS,1500,800,700\nEU,2300,1100,1200\nAPAC,890,500,390\n"
         )
         data_dir = tmp_path / "storage"
 
@@ -40,9 +37,12 @@ class TestFullPipelineCsvToValidatedReport:
         ingest_result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "ingest", str(csv_path),
-                "--name", "sales",
+                "--data-dir",
+                str(data_dir),
+                "ingest",
+                str(csv_path),
+                "--name",
+                "sales",
             ],
         )
         assert ingest_result.exit_code == 0, ingest_result.output
@@ -54,9 +54,7 @@ class TestFullPipelineCsvToValidatedReport:
                     if part.startswith("dataset_id="):
                         ds_id = part.split("=", 1)[1]
                         break
-        assert ds_id is not None, (
-            f"Could not extract dataset ID:\n{ingest_result.output}"
-        )
+        assert ds_id is not None, f"Could not extract dataset ID:\n{ingest_result.output}"
 
         # 3. Build (md + docx)
         config = {
@@ -74,8 +72,10 @@ class TestFullPipelineCsvToValidatedReport:
         build_result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "build", str(config_path),
+                "--data-dir",
+                str(data_dir),
+                "build",
+                str(config_path),
             ],
         )
         assert build_result.exit_code == 0, build_result.output
@@ -87,9 +87,7 @@ class TestFullPipelineCsvToValidatedReport:
         assert reports_dir.exists(), "reports directory missing"
 
         # Find the report subdirectory
-        report_dirs = [
-            d for d in reports_dir.iterdir() if d.is_dir()
-        ]
+        report_dirs = [d for d in reports_dir.iterdir() if d.is_dir()]
         assert len(report_dirs) >= 1, "No report directory found"
 
         report_dir = report_dirs[0]

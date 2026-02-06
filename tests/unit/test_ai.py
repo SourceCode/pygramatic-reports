@@ -74,7 +74,9 @@ class TestGenerateSuccess:
     @patch("pygramattic_reports.ai.client.subprocess.run")
     def test_generate_returns_stripped_output(self, mock_run: MagicMock) -> None:
         mock_run.return_value = MagicMock(
-            returncode=0, stdout="Generated summary text\n", stderr="",
+            returncode=0,
+            stdout="Generated summary text\n",
+            stderr="",
         )
         client = ClaudeClient(_fast_config())
         result = client.generate("Summarize this data")
@@ -109,7 +111,9 @@ class TestGenerateRetriesExhausted:
     @patch("pygramattic_reports.ai.client.subprocess.run")
     def test_raises_after_all_retries(self, mock_run: MagicMock) -> None:
         mock_run.return_value = MagicMock(
-            returncode=1, stdout="", stderr="error",
+            returncode=1,
+            stdout="",
+            stderr="error",
         )
         client = ClaudeClient(_fast_config(max_retries=2))
         with pytest.raises(AIError, match="failed after 2 attempts"):

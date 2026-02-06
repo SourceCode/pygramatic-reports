@@ -24,6 +24,22 @@ class ChartType(StrEnum):
     SCATTER = "scatter"
     HEATMAP = "heatmap"
     BOX = "box"
+    WATERFALL = "waterfall"
+    GAUGE = "gauge"
+    FUNNEL = "funnel"
+    SANKEY = "sankey"
+    TREEMAP = "treemap"
+    BUBBLE = "bubble"
+    RADAR = "radar"
+    POLAR = "polar"
+    CANDLESTICK = "candlestick"
+    OHLC = "ohlc"
+    BULLET = "bullet"
+    KAGI = "kagi"
+    RENKO = "renko"
+    POINT_AND_FIGURE = "point_and_figure"
+    HEATMAP_GRID = "heatmap_grid"
+    MOSAIC = "mosaic"
 
 
 class ChartRenderer(StrEnum):
@@ -41,6 +57,58 @@ class ChartFormat(StrEnum):
     PDF = "pdf"
 
 
+class AxisSpec(BaseModel):
+    """Configuration for a chart axis."""
+
+    model_config = ConfigDict(frozen=True)
+
+    title: str | None = None
+    visible: bool = True
+    min_value: float | None = None
+    max_value: float | None = None
+    log_scale: bool = False
+    grid: bool = True
+    labels: bool = True
+    ticks: bool = True
+    format: str | None = None  # e.g., "${x:,.0f}" or "{x:.1%}"
+
+
+class LegendSpec(BaseModel):
+    """Configuration for chart legend."""
+
+    model_config = ConfigDict(frozen=True)
+
+    visible: bool = True
+    position: str = "best"
+    title: str | None = None
+    frame: bool = True
+    columns: int = 1
+
+
+class AnnotationSpec(BaseModel):
+    """Configuration for chart annotations."""
+
+    model_config = ConfigDict(frozen=True)
+
+    text: str
+    x: float | str
+    y: float | str
+    color: str | None = None
+    size: int | None = None
+
+
+class DataLabelSpec(BaseModel):
+    """Configuration for data point labels."""
+
+    model_config = ConfigDict(frozen=True)
+
+    visible: bool = False
+    format: str | None = None  # e.g., "{:.1f}%"
+    font_size: int | None = None
+    color: str | None = None
+    position: str | None = None  # "center", "edge", "outside"
+
+
 class ChartSpec(BaseModel):
     """Abstract specification for a chart.
 
@@ -51,22 +119,25 @@ class ChartSpec(BaseModel):
     Attributes:
         chart_type: The type of chart to render.
         title: Chart title.
-        x_column: Column name for the x-axis.
-        y_columns: Column names for the y-axis.
-        dataset_id: Reference to a Dataset.
-        x_label: X-axis label.
-        y_label: Y-axis label.
-        legend: Whether to show legend.
-        legend_position: Matplotlib legend position string.
+        x_column: X-axis column name.
+        y_columns: List of Y-axis column names.
+        dataset_id: Reference to source dataset.
+        x_axis: X-axis configuration.
+        y_axis: Y-axis configuration.
+        secondary_y_axis: Secondary Y-axis configuration.
+        legend_spec: Legend configuration.
+        annotations: List of annotations.
+        data_labels: Data label configuration.
+        subplots: List of sub-chart specs for multi-chart layouts.
         width: Chart width in pixels.
         height: Chart height in pixels.
-        dpi: Dots per inch for rendering.
-        renderer: Which backend to use.
-        output_format: Output image format.
-        sort_by: Column to sort data by.
-        limit: Max data points to show.
-        group_by: Grouping column for stacked/grouped charts.
-        color_override: Custom color palette.
+        dpi: Dots per inch.
+        renderer: Rendering backend.
+        output_format: File format.
+        sort_by: Column to sort by.
+        limit: Max rows to limit.
+        group_by: Column to group by.
+        color_override: Palette override.
         background_color: Background color override.
     """
 
@@ -78,11 +149,16 @@ class ChartSpec(BaseModel):
     y_columns: list[str]
     dataset_id: str
 
-    # Optional configuration
-    x_label: str | None = None
-    y_label: str | None = None
-    legend: bool = True
-    legend_position: str = "best"
+    # Axis Configuration
+    x_axis: AxisSpec = AxisSpec()
+    y_axis: AxisSpec = AxisSpec()
+    secondary_y_axis: AxisSpec | None = None
+
+    # Components
+    legend_spec: LegendSpec = LegendSpec()
+    annotations: list[AnnotationSpec] = []
+    data_labels: DataLabelSpec = DataLabelSpec()
+    subplots: list[ChartSpec] = []
 
     # Sizing
     width: int = 800
@@ -101,3 +177,23 @@ class ChartSpec(BaseModel):
     # Theme overrides
     color_override: list[str] | None = None
     background_color: str | None = None
+
+    @property
+    def x_label(self) -> str | None:
+        """Backward compatibility for x_label."""
+        return self.x_axis.title
+
+    @property
+    def y_label(self) -> str | None:
+        """Backward compatibility for y_label."""
+        return self.y_axis.title
+
+    @property
+    def legend(self) -> bool:
+        """Backward compatibility for legend visibility."""
+        return self.legend_spec.visible
+
+    @property
+    def legend_position(self) -> str:
+        """Backward compatibility for legend position."""
+        return self.legend_spec.position

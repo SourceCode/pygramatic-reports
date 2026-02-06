@@ -1,56 +1,67 @@
 # API Reference
 
-## CLI Reference
+Pygramattic Reports provides a fluent Python API for programmatic report generation, useful for integrating into other applications (Flask/FastAPI/Django).
 
-The primary interface for Pygramattic Reports is the `report` command.
+## `Pygramattic`
 
-### `report init`
-Initializes a new project directory.
-*   `--path`: Custom path (default: current directory).
+The main entry point for the fluent interface.
 
-### `report ingest`
-Ingests a file into the system.
-*   `FILES`: List of file paths to ingest.
-*   `--type`: Force a specific loader (e.g., `csv`, `json`).
-*   `--dry-run`: Validate without saving.
+```python
+from pygramattic_reports.api import Pygramattic
 
-### `report build`
-Generates a report.
-*   `--config`: Path to YAML config file.
-*   `--format`: Override output format (default: uses config).
-*   `--output-dir`: Custom output location.
+report = (
+    Pygramattic()
+    .configure(title="Q1 Report", author="Data Team")
+    .add_dataset("sales", df_sales)  # Pass pandas DataFrame directly
+    .add_dataset("targets", df_targets)
+    .add_section(
+        title="Executive Summary",
+        content="Sales were strong this quarter...",
+        type="narrative"
+    )
+    .add_chart(
+        title="Sales vs Targets",
+        dataset="sales",
+        chart_type="bar",
+        x="region",
+        y=["amount", "target"]
+    )
+    .build()
+)
 
-### `report validate`
-Verify a generated report.
-*   `REPORT_PATH`: Path to the report file.
-*   `--strict`: Fail on minor discrepancies.
+# Export
+report.save("report.html")
+report.save("report.pdf")
+```
 
-## Python API
+## `Linker` & `Loader`
 
-You can use Pygramattic Reports as a library in your own Python scripts.
+Low-level access to data ingestion.
 
-### Loading Data
 ```python
 from pygramattic_reports.loaders import CsvLoader
-from pygramattic_reports.models import RawData
 
 loader = CsvLoader()
-raw_data: RawData = loader.load("data/sales.csv")
+dataset = loader.load("data.csv")
+print(dataset.schema)
 ```
 
-### Normalizing Data
+## `ChartEngine`
+
+Direct access to the charting subsystem.
+
 ```python
-from pygramattic_reports.normalizers import StandardNormalizer
+from pygramattic_reports.charts import ChartEngine
+from pygramattic_reports.models import ChartSpec
 
-normalizer = StandardNormalizer()
-dataset = normalizer.normalize(raw_data)
+spec = ChartSpec(chart_type="line", x_column="date", y_columns=["val"])
+image_bytes = ChartEngine().generate(spec, dataset, theme)
 ```
 
-### Generating Charts
-```python
-from pygramattic_reports.charts import ChartEngine, ChartSpec
+## Error Handling
 
-engine = ChartEngine()
-spec = ChartSpec(type="bar", data=dataset, x="product", y="amount")
-image_path = engine.render(spec)
-```
+All custom exceptions inherit from `PygramatticError`.
+
+*   `ConfigError`: Invalid configuration or YAML.
+*   `DataError`: Missing columns, validation failures, or merge errors.
+*   `BuildError`: Failures during the rendering phase.

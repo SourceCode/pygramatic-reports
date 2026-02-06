@@ -132,8 +132,7 @@ class CsvLoader(BaseLoader):
             raise LoaderError(msg, source_type="csv", source_path=str(file_path)) from exc
 
         tabular_data = [
-            dict(zip(headers, _pad_row(row, len(headers)), strict=False))
-            for row in rows
+            dict(zip(headers, _pad_row(row, len(headers)), strict=False)) for row in rows
         ]
         return headers, tabular_data
 

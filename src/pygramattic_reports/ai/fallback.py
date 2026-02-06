@@ -36,17 +36,14 @@ def generate_fallback_summary(
     df = dataset.dataframe
     lines = [f"This report presents data from {dataset.name}."]
     lines.append(
-        f"The dataset contains {dataset.row_count} records "
-        f"across {len(dataset.schema)} fields."
+        f"The dataset contains {dataset.row_count} records across {len(dataset.schema)} fields."
     )
 
     numeric_cols = df.select_dtypes(include="number").columns
     if len(numeric_cols) > 0:
         lines.append("\nKey statistics:")
         lines.extend(
-            f"- {col}: min={df[col].min():.2f}, "
-            f"max={df[col].max():.2f}, "
-            f"avg={df[col].mean():.2f}"
+            f"- {col}: min={df[col].min():.2f}, max={df[col].max():.2f}, avg={df[col].mean():.2f}"
             for col in numeric_cols[:5]
         )
 

@@ -421,7 +421,10 @@ class TestDocumentNormalizer:
 
         assert dataset.row_count == 4
         assert list(dataset.dataframe.columns) == [
-            "section_index", "section_type", "level", "content",
+            "section_index",
+            "section_type",
+            "level",
+            "content",
         ]
 
         types = dataset.dataframe["section_type"].tolist()
@@ -529,8 +532,12 @@ class TestDefaultRegistryAllTypes:
         registry = create_default_registry()
 
         for source_type in (
-            SourceType.CSV, SourceType.JSON, SourceType.XLSX,
-            SourceType.DOCX, SourceType.TXT, SourceType.MD,
+            SourceType.CSV,
+            SourceType.JSON,
+            SourceType.XLSX,
+            SourceType.DOCX,
+            SourceType.TXT,
+            SourceType.MD,
         ):
             loader = registry.get_loader(source_type)
             assert loader is not None

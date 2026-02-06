@@ -91,8 +91,7 @@ class StructuralValidator:
                         check_name=f"section_type_{i}",
                         status=CheckStatus.PASS if match else CheckStatus.WARN,
                         message=(
-                            f"Section {i}: expected {expected_type.value}, "
-                            f"got {actual_type.value}"
+                            f"Section {i}: expected {expected_type.value}, got {actual_type.value}"
                         ),
                         expected=expected_type.value,
                         actual=actual_type.value,
@@ -129,10 +128,7 @@ class StructuralValidator:
         checks: list[ValidationCheck] = []
         for i, section in enumerate(report.sections):
             if section.section_type == SectionType.CHART:
-                has_image = (
-                    section.media_bytes is not None
-                    and len(section.media_bytes) > 0
-                )
+                has_image = section.media_bytes is not None and len(section.media_bytes) > 0
                 label = "has" if has_image else "is missing"
                 checks.append(
                     ValidationCheck(

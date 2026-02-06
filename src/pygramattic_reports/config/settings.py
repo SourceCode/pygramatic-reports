@@ -201,8 +201,9 @@ class AppConfig(BaseSettings):
         settings_cls: type[BaseSettings],
         init_settings: PydanticBaseSettingsSource,
         env_settings: PydanticBaseSettingsSource,
-        dotenv_settings: PydanticBaseSettingsSource,  # noqa: ARG003
-        file_secret_settings: PydanticBaseSettingsSource,  # noqa: ARG003
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+        **kwargs: Any,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         """Customise settings sources for correct override priority.
 

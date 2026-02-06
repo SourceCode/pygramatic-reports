@@ -68,7 +68,9 @@ class JsonLoader(BaseLoader):
         except OSError as exc:
             msg = f"Failed to compute checksum for {file_path}: {exc}"
             raise LoaderError(
-                msg, source_type="json", source_path=str(file_path),
+                msg,
+                source_type="json",
+                source_path=str(file_path),
             ) from exc
 
     @staticmethod
@@ -79,19 +81,25 @@ class JsonLoader(BaseLoader):
         except UnicodeDecodeError as exc:
             msg = f"Encoding error reading {file_path}: {exc}"
             raise LoaderError(
-                msg, source_type="json", source_path=str(file_path),
+                msg,
+                source_type="json",
+                source_path=str(file_path),
             ) from exc
         except OSError as exc:
             msg = f"Failed to read {file_path}: {exc}"
             raise LoaderError(
-                msg, source_type="json", source_path=str(file_path),
+                msg,
+                source_type="json",
+                source_path=str(file_path),
             ) from exc
         try:
             return json.loads(text)
         except json.JSONDecodeError as exc:
             msg = f"Invalid JSON in {file_path}: {exc}"
             raise LoaderError(
-                msg, source_type="json", source_path=str(file_path),
+                msg,
+                source_type="json",
+                source_path=str(file_path),
             ) from exc
 
     @staticmethod
@@ -111,10 +119,7 @@ class JsonLoader(BaseLoader):
                     seen.add(key)
 
         # Convert all values to strings for consistency with CSV loader
-        tabular_data = [
-            {key: row.get(key) for key in headers}
-            for row in data
-        ]
+        tabular_data = [{key: row.get(key) for key in headers} for row in data]
 
         _logger.info(
             "Loaded tabular JSON",

@@ -1,43 +1,37 @@
 # Contributing Guide
 
-Thank you for your interest in contributing to Pygramattic Reports!
+## Development Workflow
 
-## Workflow
+1.  **Fork & Clone**: Standard GitHub flow.
+2.  **Environment**: Use `hatch` or `venv` to set up dependencies.
+3.  **Branching**: Use feature branches `feature/my-feature`.
+4.  **Commits**: Use conventional commits (e.g., `feat: add new chart type`).
 
-1.  **Fork** the repository.
-2.  **Create a Branch** for your feature or fix (`git checkout -b feature/amazing-feature`).
-3.  **Install Dev Dependencies** (`pip install -e ".[dev]"`).
-4.  **Write Code**.
-5.  **Write Tests** (verify with `pytest`).
-6.  **Lint** (verify with `ruff check .`).
-7.  **Push** to your fork.
-8.  **Open a Pull Request**.
+## Standards
 
-## Code Style
-
-We follow strict coding standards:
-
-*   **Formatter**: `black` (via Ruff)
-*   **Linter**: `ruff`
-*   **Type Checker**: `mypy` (Strict mode)
-
-Run the full quality suite before committing:
+### Code Style
+We use **Ruff** for linting and formatting. It is strict.
 
 ```bash
-ruff check .
-mypy .
-pytest
+# Check code
+ruff check src/
+
+# Format code
+ruff format src/
 ```
 
-## Commit Messages
+### Type Safety
+We use **MyPy** in strict mode. All public functions must have type hints.
 
-Please usage conventional commits:
-*   `feat: add new csv loader`
-*   `fix: resolve normalization error`
-*   `docs: update readme`
+```bash
+mypy src/
+```
 
-## Pull Request Process
+### Testing
+New features must include unit tests. New bug fixes must include a regression test.
 
-*   Ensure CI passes.
-*   Update documentation if you change functionality.
-*   Add a description of your changes in the PR.
+## Review Process
+
+1.  Open a PR targeting `main`.
+2.  Ensure CI passes (Lint + Test).
+3.  A maintainer will review. Focus is on API consistency and Test Coverage.

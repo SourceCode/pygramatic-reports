@@ -217,9 +217,10 @@ class TestEvaluateConditionTrue:
     def test_evaluate_condition_string_in(self) -> None:
         """String membership check works."""
         renderer = TemplateRenderer()
-        assert renderer.evaluate_condition(
-            "'revenue' in columns", {"columns": ["revenue", "cost"]}
-        ) is True
+        assert (
+            renderer.evaluate_condition("'revenue' in columns", {"columns": ["revenue", "cost"]})
+            is True
+        )
 
 
 class TestEvaluateConditionFalse:
@@ -264,9 +265,7 @@ class TestResolveTemplateFiltersSections:
             ],
         )
         renderer = TemplateRenderer()
-        resolved = renderer.resolve_template(
-            template, {"title": "My Report", "show_data": False}
-        )
+        resolved = renderer.resolve_template(template, {"title": "My Report", "show_data": False})
 
         assert len(resolved) == 2
         assert resolved[0].content == "My Report"

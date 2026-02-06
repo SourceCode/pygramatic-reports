@@ -39,6 +39,12 @@ _SECTION_TYPE_MAP: dict[str, SectionType] = {
     "spacer": SectionType.SPACER,
     "page_break": SectionType.PAGE_BREAK,
     "table_of_contents": SectionType.TABLE_OF_CONTENTS,
+    "list": SectionType.LIST,
+    "callout": SectionType.CALLOUT,
+    "metric_card": SectionType.METRIC_CARD,
+    "code_block": SectionType.CODE_BLOCK,
+    "quote": SectionType.QUOTE,
+    "columns": SectionType.COLUMNS,
 }
 
 
@@ -72,6 +78,18 @@ def process_static_section(
         Tuple of (ReportSection, empty NumberClaim list).
     """
     section_type = map_section_type(spec.type)
+
+    # Route specialized layout types
+    if section_type in (
+        SectionType.LIST,
+        SectionType.CALLOUT,
+        SectionType.METRIC_CARD,
+        SectionType.CODE_BLOCK,
+        SectionType.QUOTE,
+        SectionType.COLUMNS,
+    ):
+        return process_layout_section(spec)
+
     return (
         ReportSection(
             section_type=section_type,
@@ -109,8 +127,35 @@ def process_data_table_section(
     rows = df.values.tolist()
 
     claims = _generate_number_claims(
-        headers, rows, dataset, section_index,
+        headers,
+        rows,
+        dataset,
+        section_index,
     )
+
+    if spec.show_totals:
+        totals_row = ["Total"]
+        for col_name in headers[1:]:
+            try:
+                # Naive sum for now
+                col_sum = df[col_name].sum()
+                if isinstance(col_sum, (int, float)):
+                    totals_row.append(col_sum)
+                else:
+                    totals_row.append("")
+            except Exception:
+                totals_row.append("")
+
+        # Store totals separately or append?
+        # HTML <tfoot> is better. Let's return it as separate data.
+        return (
+            ReportSection(
+                section_type=SectionType.DATA_TABLE,
+                title=spec.title,
+                table_data={"headers": headers, "rows": rows, "totals": totals_row},
+            ),
+            claims,
+        )
 
     return (
         ReportSection(
@@ -195,6 +240,78 @@ def process_ai_placeholder_section(
     )
 
 
+def process_layout_section(
+    spec: TemplateSectionSpec,
+) -> tuple[ReportSection, list[NumberClaim]]:
+    """Process layout and rich content sections.
+
+    Args:
+        spec: Template section specification.
+
+    Returns:
+        Tuple of (ReportSection, empty claims).
+    """
+    st = map_section_type(spec.type)
+
+    section = ReportSection(
+        section_type=st,
+        title=spec.title,
+        level=spec.level,
+        content=spec.content,
+    )
+
+    # 1. Lists
+    if st == SectionType.LIST:
+        # TODO: Add support for data-driven lists later
+        items = spec.items or []
+        section = section.model_copy(update={"list_data": items})
+
+    # 2. Callouts
+    elif st == SectionType.CALLOUT:
+        callout_data = {
+            "type": spec.callout_type or "info",
+            "content": spec.content or "",
+        }
+        section = section.model_copy(update={"callout_data": callout_data})
+
+    # 3. Metric Cards
+    elif st == SectionType.METRIC_CARD:
+        metric = spec.metric or {}
+        # TODO: Add logic to calculate metric from dataset if needed
+        section = section.model_copy(update={"card_data": metric})
+
+    # 4. Code Blocks
+    elif st == SectionType.CODE_BLOCK:
+        code_data = {
+            "language": spec.language or "text",
+            "code": spec.code or spec.content or "",
+        }
+        section = section.model_copy(update={"code_data": code_data})
+
+    # 5. Quotes
+    elif st == SectionType.QUOTE:
+        quote_data = {
+            "text": spec.content or "",
+            "author": spec.quote_author or "",
+        }
+        section = section.model_copy(update={"quote_data": quote_data})
+
+    # 6. Columns (Nested)
+    elif st == SectionType.COLUMNS and spec.columns_spec:
+        # Recursively process columns (simplification: only generic layout types)
+        # In a full implementation, we'd need the builder context here to process charts/data
+        # For now, we only support static content in columns
+        col_sections = []
+        for col_spec in spec.columns_spec:
+            # Recursion restricted to static/layout for now
+            col_sec, _ = process_static_section(col_spec)
+            col_sections.append(col_sec)
+
+        section = section.model_copy(update={"columns_data": col_sections})
+
+    return section, []
+
+
 # -- Helpers ------------------------------------------------------------------
 
 
@@ -209,7 +326,8 @@ def _generate_number_claims(
 
     for col_idx, col_name in enumerate(headers):
         col_schema = next(
-            (c for c in dataset.schema if c.name == col_name), None,
+            (c for c in dataset.schema if c.name == col_name),
+            None,
         )
         if col_schema is None or col_schema.dtype not in ("int", "float"):
             continue

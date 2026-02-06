@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="pygramattic-reports">
+    <title>Theme Verification</title>
+    <style>
+        
+            :root {
+                /* System Variables */
+                --color-primary: #00ff00;
+    --color-secondary: #ff00ff;
+    --color-accent: #00ffff;
+    --color-background: #000000;
+    --color-text: #ffffff;
+    --color-text-light: #cccccc;
+    --font-heading: Courier New, sans-serif;
+    --font-body: Arial, sans-serif;
+    --font-monospace: Consolas, monospace;
+    --size-title: 24pt;
+    --size-heading: 16pt;
+    --size-body: 11pt;
+    --size-caption: 9pt;
+    --spacing-section: 18pt;
+    --spacing-paragraph: 6pt;
+    --page-margin: 1.0in;
+    --chart-bg: #ffffff;
+    --chart-grid: #e0e0e0;
+    --chart-color-0: #ff00ff;
+    --chart-color-1: #00ffff;
+    --chart-color-2: #00ff00;
+            }
+
+            body {
+                font-family: var(--font-body);
+                color: var(--color-text);
+                background-color: var(--color-background);
+                line-height: 1.6;
+                margin: 0;
+                padding: var(--page-margin);
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                font-family: var(--font-heading);
+                color: var(--color-primary);
+                margin-top: var(--spacing-section);
+                margin-bottom: var(--spacing-paragraph);
+            }
+            
+            h1 { font-size: var(--size-title); border-bottom: 2px solid var(--color-secondary); padding-bottom: 0.5rem; }
+            h2 { font-size: var(--size-heading); border-bottom: 1px solid #eee; }
+            h3 { font-size: calc(var(--size-heading) * 0.85); color: var(--color-secondary); }
+            
+            p {
+                margin-bottom: var(--spacing-paragraph);
+                font-size: var(--size-body);
+            }
+            
+            code, pre {
+                font-family: var(--font-monospace);
+                background-color: #f5f5f5;
+                border-radius: 4px;
+            }
+            
+            pre { padding: 1rem; overflow-x: auto; font-size: 0.9em; border: 1px solid #ddd; }
+
+            /* --- Layout Components --- */
+
+            /* Metric Cards */
+            .metric-card-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+                margin-bottom: var(--spacing-section);
+            }
+            
+            .metric-card {
+                border: 1px solid #eee;
+                border-left: 4px solid var(--color-secondary);
+                border-radius: 4px;
+                padding: 1rem;
+                min-width: 150px;
+                flex: 1;
+                background:white;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            
+            .metric-label {
+                font-size: 0.8em;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--color-text-light);
+            }
+            
+            .metric-value {
+                font-size: 1.8em;
+                font-weight: bold;
+                color: var(--color-primary);
+                margin: 0.25rem 0;
+            }
+
+            /* Callouts */
+            .callout {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-left: 4px solid #ccc;
+                border-radius: 0 4px 4px 0;
+                background-color: #f9f9f9;
+            }
+            
+            .callout-title {
+                font-weight: bold;
+                margin-bottom: 0.5rem;
+                display:block;
+            }
+            
+            .callout-info { border-left-color: #3498db; background-color: #ebf5fb; }
+            .callout-warning { border-left-color: #f39c12; background-color: #fef9e7; }
+            .callout-success { border-left-color: #2ecc71; background-color: #eafaf1; }
+            .callout-danger { border-left-color: #e74c3c; background-color: #fdedec; }
+
+            /* Lists */
+            ul.styled-list {
+                list-style-type: disc;
+                padding-left: 1.5rem;
+            }
+            
+            /* Quotes */
+            blockquote {
+                border-left: 3px solid var(--color-accent);
+                margin: 1.5rem 0;
+                padding: 0.5rem 1.5rem;
+                font-style: italic;
+                background: #fdfdfd;
+                color: #555;
+            }
+            
+            .quote-author {
+                display: block;
+                margin-top: 0.5rem;
+                font-style: normal;
+                font-weight: bold;
+                font-size: 0.9em;
+                color: var(--color-text-light);
+            }
+            
+            /* Columns */
+            .columns-container {
+                display: grid;
+                gap: 2rem;
+                margin-bottom: var(--spacing-section);
+            }
+            
+            @media (min-width: 768px) {
+                .columns-container {
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                }
+            }
+
+            /* Tables */
+            table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+            th { text-align: left; background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 0.75rem; color: var(--color-text-light); font-size: 0.9em; text-transform:uppercase; }
+            td { border-bottom: 1px solid #dee2e6; padding: 0.75rem; vertical-align:top; }
+            tr:nth-child(even) { background-color: #f8f9fa; }
+
+            /* Print Overrides */
+            @media print {
+                body { padding: 0; font-size: 11pt; }
+                .page-break { page-break-before: always; }
+                a { text-decoration: none; color: black; }
+            }
+        
+        
+        /* Custom Overrides */
+        
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        
+        <!-- Cover Page -->
+        
+        <!-- Default Title Block if no cover page -->
+        <header class="report-header">
+            <h1>Theme Verification</h1>
+            <p class="meta">Generated: 2026-02-06 16:52:59.078787+00:00</p>
+        </header>
+        <hr>
+        
+        
+        <!-- TOC -->
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+
+        <!-- Content Sections -->
+        
+            <div class="section section-title"><h1>Cyberpunk Report</h1></div>
+        
+            <div class="section section-narrative"><h2>Introduction</h2><div>This report demonstrates the vivid Cyberpunk theme applied automatically via CSS variables.</div></div>
+        
+            <div class="section section-metric_card"><div class="metric-card-container">
+        <div class="metric-card">
+            <div class="metric-label">System Status</div>
+            <div class="metric-value">ONLINE</div>
+        </div>
+        </div></div>
+        
+            <div class="section section-callout">
+        <div class="callout callout-warning">
+            <span class="callout-title">Warning</span>
+            Rogue AI detected in sector 7.
+        </div>
+        </div>
+        
+            <div class="section section-list"><h3>Active Protocols</h3><ul class="styled-list"><li>Protocol Omega</li><li>Protocol Alpha</li><li>Protocol Zed</li></ul></div>
+        
+            <div class="section section-code_block"><h3>Override Code</h3><pre><code>sudo rm -rf /virus</code></pre></div>
+        
+        
+    </div>
+</body>
+</html>

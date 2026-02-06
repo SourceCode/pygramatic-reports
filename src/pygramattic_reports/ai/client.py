@@ -79,7 +79,7 @@ class ClaudeClient:
             except AIError as exc:
                 last_error = exc
                 if attempt < self.config.max_retries:
-                    wait = self.config.retry_backoff_factor ** attempt
+                    wait = self.config.retry_backoff_factor**attempt
                     logger.warning(
                         "AI call failed, retrying",
                         attempt=attempt,

@@ -2,65 +2,63 @@
 
 ## Prerequisites
 
-Before installing Pygramattic Reports, ensure you have the following:
-
 *   **Python**: Version 3.11 or higher.
+*   **Package Manager**: `pip` (standard) or `hatch` (for development).
 *   **Operating System**: Linux, macOS, or Windows.
-*   **Git**: For cloning the repository.
 
-## Package Manager
+## Installation Methods
 
-We recommend using `pip` or `hatch` for managing dependencies.
+### Method 1: PyPI (Recommended for Users)
 
-## Installation Steps
+```bash
+pip install pygramattic-reports
+```
 
-1.  **Clone the Repository**
+### Method 2: Source (Recommended for Developers)
 
+1.  **Clone the repository**:
     ```bash
     git clone https://github.com/yourusername/pygramattic-reports.git
     cd pygramattic-reports
     ```
 
-2.  **Create a Virtual Environment (Optional but Recommended)**
-
+2.  **Create a virtual environment**:
     ```bash
     python -m venv .venv
-    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+    source .venv/bin/activate  # on Windows: .venv\Scripts\activate
     ```
 
-3.  **Install Dependencies**
-
-    Install the package in editable mode with all optional dependencies (dev, test, google):
-
+3.  **Install in editable mode**:
     ```bash
-    pip install -e ".[all]"
+    pip install -e ".[dev,all]"
     ```
+    This installs:
+    *   **Core**: `pydantic`, `pandas`, `jinja2`, `typer`
+    *   **Vis**: `matplotlib`, `seaborn`
+    *   **IO**: `openpyxl`, `python-docx`
+    *   **Dev**: `pytest`, `ruff`, `mypy`, `pre-commit`
 
-    Or install specific groups:
+## Verifying Installation
 
-    ```bash
-    pip install -e ".[dev]"  # For development tools
-    pip install -e ".[google]" # For Google integrations
-    ```
-
-## Verify Installation
-
-Run the CLI help command to verify the installation:
+Verify that the CLI is accessible:
 
 ```bash
-report --help
+report --version
 ```
 
-You should see the output:
-`Pygramattic Reports - Unified Report Processing & Generation Tool`
+You should see output similar to:
+`pygramattic-reports version 0.1.0`
 
 ## Common Issues
 
-### Python Version Mismatch
-If you see an error related to Python version, ensure you are running 3.11+:
+### H3: Missing Build Tools
+If you encounter errors related to building wheels, ensure you have basic build tools installed:
 ```bash
-python --version
+pip install --upgrade pip setuptools wheel
 ```
 
-### Dependency Conflicts
-If you have existing packages that conflict, try attempting a clean install in a fresh virtual environment.
+### H3: Matplotlib Backend
+On headless servers (CI/CD), you may need to configure the Matplotlib backend to `Agg` to prevent display errors:
+```bash
+export MPLBACKEND=Agg
+```

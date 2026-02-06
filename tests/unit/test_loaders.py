@@ -48,7 +48,11 @@ class TestCsvLoaderBasic:
 
         assert raw.content_type == ContentType.TABULAR
         assert raw.tabular_headers == [
-            "region", "revenue", "quarter", "growth_pct", "is_active",
+            "region",
+            "revenue",
+            "quarter",
+            "growth_pct",
+            "is_active",
         ]
         assert raw.row_count == 5
         assert len(raw.tabular_data) == 5

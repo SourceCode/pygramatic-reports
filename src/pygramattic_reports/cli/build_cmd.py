@@ -77,8 +77,14 @@ def build(
     storage.initialize()
 
     build_config = _resolve_build_config(
-        config_file, app_config, storage,
-        output_format, output_dir, template, theme, no_ai,
+        config_file,
+        app_config,
+        storage,
+        output_format,
+        output_dir,
+        template,
+        theme,
+        no_ai,
     )
 
     if not quiet:
@@ -119,8 +125,13 @@ def _resolve_build_config(
         raise typer.Exit(code=1) from None
 
     return _apply_overrides(
-        build_config, app_config,
-        output_format, output_dir, template_name, theme_name, no_ai,
+        build_config,
+        app_config,
+        output_format,
+        output_dir,
+        template_name,
+        theme_name,
+        no_ai,
     )
 
 
@@ -160,8 +171,7 @@ def _init_claude_client(
     if not client.is_available():
         if not quiet:
             console.print(
-                "  AI: [yellow]Unavailable[/yellow] "
-                "(Claude CLI not found, using fallbacks)"
+                "  AI: [yellow]Unavailable[/yellow] (Claude CLI not found, using fallbacks)"
             )
         return None
 
@@ -208,8 +218,7 @@ def _write_outputs(
         warnings = build_log.sections_skipped
         w_text = f", {warnings} warnings" if warnings else ""
         console.print(
-            f"\nReport built successfully: "
-            f"{build_log.sections_generated} sections{w_text}"
+            f"\nReport built successfully: {build_log.sections_generated} sections{w_text}"
         )
 
 
@@ -267,9 +276,7 @@ def _print_plan(config: BuildConfig) -> None:
     console.print(f"\nBuilding report: [bold]{config.report_name}[/bold]")
     console.print(f"  Template: {config.template.name}")
     console.print(f"  Theme: {config.theme.name}")
-    ds_info = ", ".join(
-        f"{n} ({d.row_count} rows)" for n, d in config.datasets.items()
-    )
+    ds_info = ", ".join(f"{n} ({d.row_count} rows)" for n, d in config.datasets.items())
     console.print(f"  Datasets: {ds_info}")
     console.print(f"  Formats: {', '.join(config.output_formats)}")
 
@@ -279,8 +286,7 @@ def _has_media(report: Report) -> bool:
     from pygramattic_reports.models import SectionType  # noqa: PLC0415
 
     return any(
-        s.section_type in (SectionType.CHART, SectionType.IMAGE)
-        and s.media_bytes
+        s.section_type in (SectionType.CHART, SectionType.IMAGE) and s.media_bytes
         for s in report.sections
     )
 

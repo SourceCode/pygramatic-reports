@@ -27,13 +27,17 @@ console = Console()
 def feedback(
     ctx: typer.Context,
     original: str = typer.Argument(
-        ..., help="Path to the original generated report",
+        ...,
+        help="Path to the original generated report",
     ),
     edited: str = typer.Argument(
-        ..., help="Path to the user-edited version",
+        ...,
+        help="Path to the user-edited version",
     ),
     output: str | None = typer.Option(
-        None, "--output", "-o",
+        None,
+        "--output",
+        "-o",
         help="Save feedback report to file (JSON)",
     ),
 ) -> None:
@@ -122,18 +126,14 @@ def _print_feedback(diff: object, report: object) -> None:
     if not isinstance(diff, ReportDiff) or not isinstance(report, FeedbackReport):
         return
 
-    console.print(
-        f"\nComparing: {diff.original_path} \u2192 {diff.edited_path}"
-    )
+    console.print(f"\nComparing: {diff.original_path} \u2192 {diff.edited_path}")
     console.print(f"  Format: {diff.format}")
     console.print(f"  Changes: {diff.summary}")
 
     if report.recommendations:
         console.print("\nRecommendations:")
         for i, rec in enumerate(report.recommendations, 1):
-            console.print(
-                f"  {i}. [{rec.category.title()}] {rec.section}"
-            )
+            console.print(f"  {i}. [{rec.category.title()}] {rec.section}")
             console.print(f"     {rec.description}")
     else:
         console.print("\nNo recommendations.")

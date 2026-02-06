@@ -1,0 +1,14 @@
+include LICENSE
+include README.md
+include pyproject.toml
+
+recursive-include src/pygramattic_reports *.yaml *.json *.html *.css
+recursive-include docs *
+recursive-include examples *
+recursive-include tests *
+
+exclude .gitignore
+exclude .coverage
+recursive-exclude .github *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]

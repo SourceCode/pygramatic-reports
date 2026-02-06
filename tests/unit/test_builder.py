@@ -88,16 +88,21 @@ class TestBuildStaticSections:
 
     def test_build_static_sections(self) -> None:
         """Title + heading sections render correctly."""
-        config = _build_config([
-            TemplateSectionSpec(
-                type="title", source=SectionSource.STATIC,
-                content="My Report",
-            ),
-            TemplateSectionSpec(
-                type="heading", source=SectionSource.STATIC,
-                content="Introduction", level=2,
-            ),
-        ])
+        config = _build_config(
+            [
+                TemplateSectionSpec(
+                    type="title",
+                    source=SectionSource.STATIC,
+                    content="My Report",
+                ),
+                TemplateSectionSpec(
+                    type="heading",
+                    source=SectionSource.STATIC,
+                    content="Introduction",
+                    level=2,
+                ),
+            ]
+        )
         report, log = _builder().build(config)
 
         assert len(report.sections) == 2
@@ -113,12 +118,16 @@ class TestBuildDataTableSection:
 
     def test_build_data_table_section(self) -> None:
         """Data table contains correct headers and rows."""
-        config = _build_config([
-            TemplateSectionSpec(
-                type="data_table", source=SectionSource.DATA,
-                title="Revenue Table", dataset="main",
-            ),
-        ])
+        config = _build_config(
+            [
+                TemplateSectionSpec(
+                    type="data_table",
+                    source=SectionSource.DATA,
+                    title="Revenue Table",
+                    dataset="main",
+                ),
+            ]
+        )
         report, _ = _builder().build(config)
 
         assert len(report.sections) == 1
@@ -134,14 +143,19 @@ class TestBuildChartSection:
 
     def test_build_chart_section(self) -> None:
         """Chart section contains image bytes."""
-        config = _build_config([
-            TemplateSectionSpec(
-                type="chart", source=SectionSource.CHART,
-                title="Revenue Chart", dataset="main",
-                chart_type="bar", x_column="region",
-                y_columns=["revenue"],
-            ),
-        ])
+        config = _build_config(
+            [
+                TemplateSectionSpec(
+                    type="chart",
+                    source=SectionSource.CHART,
+                    title="Revenue Chart",
+                    dataset="main",
+                    chart_type="bar",
+                    x_column="region",
+                    y_columns=["revenue"],
+                ),
+            ]
+        )
         report, _ = _builder().build(config)
 
         assert len(report.sections) == 1
@@ -157,12 +171,16 @@ class TestBuildAiPlaceholder:
 
     def test_build_ai_placeholder(self) -> None:
         """AI sections get placeholder content."""
-        config = _build_config([
-            TemplateSectionSpec(
-                type="summary", source=SectionSource.AI_GENERATED,
-                title="Summary", ai_prompt="Summarize the data",
-            ),
-        ])
+        config = _build_config(
+            [
+                TemplateSectionSpec(
+                    type="summary",
+                    source=SectionSource.AI_GENERATED,
+                    title="Summary",
+                    ai_prompt="Summarize the data",
+                ),
+            ]
+        )
         report, _ = _builder().build(config)
 
         assert len(report.sections) == 1
@@ -177,26 +195,36 @@ class TestBuildFullReport:
 
     def test_build_full_report(self) -> None:
         """Complete template produces Report with all sections."""
-        config = _build_config([
-            TemplateSectionSpec(
-                type="title", source=SectionSource.STATIC,
-                content="{{ report_title }}",
-            ),
-            TemplateSectionSpec(
-                type="data_table", source=SectionSource.DATA,
-                title="Data", dataset="main",
-            ),
-            TemplateSectionSpec(
-                type="chart", source=SectionSource.CHART,
-                title="Chart", dataset="main",
-                chart_type="bar", x_column="region",
-                y_columns=["revenue"],
-            ),
-            TemplateSectionSpec(
-                type="summary", source=SectionSource.AI_GENERATED,
-                title="Summary", ai_prompt="Summarize",
-            ),
-        ])
+        config = _build_config(
+            [
+                TemplateSectionSpec(
+                    type="title",
+                    source=SectionSource.STATIC,
+                    content="{{ report_title }}",
+                ),
+                TemplateSectionSpec(
+                    type="data_table",
+                    source=SectionSource.DATA,
+                    title="Data",
+                    dataset="main",
+                ),
+                TemplateSectionSpec(
+                    type="chart",
+                    source=SectionSource.CHART,
+                    title="Chart",
+                    dataset="main",
+                    chart_type="bar",
+                    x_column="region",
+                    y_columns=["revenue"],
+                ),
+                TemplateSectionSpec(
+                    type="summary",
+                    source=SectionSource.AI_GENERATED,
+                    title="Summary",
+                    ai_prompt="Summarize",
+                ),
+            ]
+        )
         report, log = _builder().build(config)
 
         assert report.name == "Test Report"
@@ -212,12 +240,16 @@ class TestBuildMissingDataset:
 
     def test_build_missing_dataset(self) -> None:
         """Raises BuildError for missing dataset reference."""
-        config = _build_config([
-            TemplateSectionSpec(
-                type="data_table", source=SectionSource.DATA,
-                title="Data", dataset="nonexistent",
-            ),
-        ])
+        config = _build_config(
+            [
+                TemplateSectionSpec(
+                    type="data_table",
+                    source=SectionSource.DATA,
+                    title="Data",
+                    dataset="nonexistent",
+                ),
+            ]
+        )
         with pytest.raises(BuildError, match="not found"):
             _builder().build(config)
 
@@ -227,12 +259,16 @@ class TestBuildConditionalSectionIncluded:
 
     def test_build_conditional_section_included(self) -> None:
         """Condition=true results in section being included."""
-        config = _build_config([
-            TemplateSectionSpec(
-                type="heading", source=SectionSource.STATIC,
-                content="Always", condition="True",
-            ),
-        ])
+        config = _build_config(
+            [
+                TemplateSectionSpec(
+                    type="heading",
+                    source=SectionSource.STATIC,
+                    content="Always",
+                    condition="True",
+                ),
+            ]
+        )
         report, _ = _builder().build(config)
         assert len(report.sections) == 1
 
@@ -242,12 +278,16 @@ class TestBuildConditionalSectionExcluded:
 
     def test_build_conditional_section_excluded(self) -> None:
         """Condition=false results in section being excluded."""
-        config = _build_config([
-            TemplateSectionSpec(
-                type="heading", source=SectionSource.STATIC,
-                content="Never", condition="False",
-            ),
-        ])
+        config = _build_config(
+            [
+                TemplateSectionSpec(
+                    type="heading",
+                    source=SectionSource.STATIC,
+                    content="Never",
+                    condition="False",
+                ),
+            ]
+        )
         report, _ = _builder().build(config)
         assert len(report.sections) == 0
 
@@ -257,16 +297,21 @@ class TestBuildLogTracking:
 
     def test_build_log_tracking(self) -> None:
         """BuildLog records events correctly."""
-        config = _build_config([
-            TemplateSectionSpec(
-                type="title", source=SectionSource.STATIC,
-                content="Title",
-            ),
-            TemplateSectionSpec(
-                type="data_table", source=SectionSource.DATA,
-                title="Data", dataset="main",
-            ),
-        ])
+        config = _build_config(
+            [
+                TemplateSectionSpec(
+                    type="title",
+                    source=SectionSource.STATIC,
+                    content="Title",
+                ),
+                TemplateSectionSpec(
+                    type="data_table",
+                    source=SectionSource.DATA,
+                    title="Data",
+                    dataset="main",
+                ),
+            ]
+        )
         _, log = _builder().build(config)
 
         assert log.sections_generated == 2
@@ -280,20 +325,22 @@ class TestNumberClaimsGenerated:
 
     def test_number_claims_generated(self) -> None:
         """Data table sections generate NumberClaims for numeric cols."""
-        config = _build_config([
-            TemplateSectionSpec(
-                type="data_table", source=SectionSource.DATA,
-                title="Data", dataset="main",
-            ),
-        ])
+        config = _build_config(
+            [
+                TemplateSectionSpec(
+                    type="data_table",
+                    source=SectionSource.DATA,
+                    title="Data",
+                    dataset="main",
+                ),
+            ]
+        )
         report, _ = _builder().build(config)
 
         # revenue (3 rows) + cost (3 rows) = 6 claims
         assert len(report.number_claims) == 6
         assert all(c.section_index == 0 for c in report.number_claims)
-        revenues = [
-            c for c in report.number_claims if c.source_column == "revenue"
-        ]
+        revenues = [c for c in report.number_claims if c.source_column == "revenue"]
         assert len(revenues) == 3
 
 
@@ -302,22 +349,29 @@ class TestBuildRecoverableError:
 
     def test_build_recoverable_error(self) -> None:
         """Chart failure (recoverable) skips section, continues build."""
-        config = _build_config([
-            TemplateSectionSpec(
-                type="title", source=SectionSource.STATIC,
-                content="Title",
-            ),
-            TemplateSectionSpec(
-                type="chart", source=SectionSource.CHART,
-                title="Bad Chart", dataset="main",
-                chart_type="bar", x_column="region",
-                y_columns=["nonexistent_column"],
-            ),
-            TemplateSectionSpec(
-                type="heading", source=SectionSource.STATIC,
-                content="End",
-            ),
-        ])
+        config = _build_config(
+            [
+                TemplateSectionSpec(
+                    type="title",
+                    source=SectionSource.STATIC,
+                    content="Title",
+                ),
+                TemplateSectionSpec(
+                    type="chart",
+                    source=SectionSource.CHART,
+                    title="Bad Chart",
+                    dataset="main",
+                    chart_type="bar",
+                    x_column="region",
+                    y_columns=["nonexistent_column"],
+                ),
+                TemplateSectionSpec(
+                    type="heading",
+                    source=SectionSource.STATIC,
+                    content="End",
+                ),
+            ]
+        )
         report, log = _builder().build(config)
 
         # Chart section should be skipped (ChartError is RECOVERABLE)

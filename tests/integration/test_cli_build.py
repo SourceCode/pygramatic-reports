@@ -29,9 +29,7 @@ def _ingest_csv(tmp_path: Path) -> tuple[Path, str]:
     from the CLI output.
     """
     csv_path = tmp_path / "sales.csv"
-    csv_path.write_text(
-        "region,revenue,cost\nUS,1500,800\nEU,2300,1100\nAPAC,890,500\n"
-    )
+    csv_path.write_text("region,revenue,cost\nUS,1500,800\nEU,2300,1100\nAPAC,890,500\n")
     data_dir = tmp_path / "storage"
     result = runner.invoke(
         app,
@@ -83,8 +81,10 @@ class TestBuildMarkdownReport:
         result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "build", str(config_path),
+                "--data-dir",
+                str(data_dir),
+                "build",
+                str(config_path),
             ],
         )
         assert result.exit_code == 0, result.output
@@ -106,8 +106,10 @@ class TestBuildDocxReport:
         result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "build", str(config_path),
+                "--data-dir",
+                str(data_dir),
+                "build",
+                str(config_path),
             ],
         )
         assert result.exit_code == 0, result.output
@@ -127,9 +129,14 @@ class TestBuildMultipleFormats:
         result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "build", str(config_path),
-                "-o", "md", "-o", "docx",
+                "--data-dir",
+                str(data_dir),
+                "build",
+                str(config_path),
+                "-o",
+                "md",
+                "-o",
+                "docx",
             ],
         )
         assert result.exit_code == 0, result.output
@@ -147,8 +154,10 @@ class TestBuildMissingConfig:
         result = runner.invoke(
             app,
             [
-                "--data-dir", str(tmp_path),
-                "build", str(tmp_path / "nonexistent.yaml"),
+                "--data-dir",
+                str(tmp_path),
+                "build",
+                str(tmp_path / "nonexistent.yaml"),
             ],
         )
         assert result.exit_code == 1
@@ -168,8 +177,10 @@ class TestBuildMissingDataset:
         result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "build", str(config_path),
+                "--data-dir",
+                str(data_dir),
+                "build",
+                str(config_path),
             ],
         )
         assert result.exit_code == 1
@@ -189,8 +200,10 @@ class TestBuildDryRun:
         result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "build", str(config_path),
+                "--data-dir",
+                str(data_dir),
+                "build",
+                str(config_path),
                 "--dry-run",
             ],
         )
@@ -210,7 +223,9 @@ class TestBuildTemplateOverride:
         data_dir, ds_id = _ingest_csv(tmp_path)
         # quarterly_report template expects dataset named "main_data"
         config_path = _write_report_config(
-            tmp_path, ds_id, template="default",
+            tmp_path,
+            ds_id,
+            template="default",
         )
         # Rewrite config with main_data key for quarterly template
         config = {
@@ -227,9 +242,12 @@ class TestBuildTemplateOverride:
         result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "build", str(config_path),
-                "--template", "quarterly_report",
+                "--data-dir",
+                str(data_dir),
+                "build",
+                str(config_path),
+                "--template",
+                "quarterly_report",
             ],
         )
         assert result.exit_code == 0, result.output
@@ -249,10 +267,14 @@ class TestExportJson:
         result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "export", ds_id,
-                "-f", "json",
-                "-o", str(out_file),
+                "--data-dir",
+                str(data_dir),
+                "export",
+                ds_id,
+                "-f",
+                "json",
+                "-o",
+                str(out_file),
             ],
         )
         assert result.exit_code == 0, result.output
@@ -275,10 +297,14 @@ class TestExportCsv:
         result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "export", ds_id,
-                "-f", "csv",
-                "-o", str(out_file),
+                "--data-dir",
+                str(data_dir),
+                "export",
+                ds_id,
+                "-f",
+                "csv",
+                "-o",
+                str(out_file),
             ],
         )
         assert result.exit_code == 0, result.output
@@ -301,10 +327,14 @@ class TestExportSql:
         result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "export", ds_id,
-                "-f", "sql",
-                "-o", str(out_file),
+                "--data-dir",
+                str(data_dir),
+                "export",
+                ds_id,
+                "-f",
+                "sql",
+                "-o",
+                str(out_file),
             ],
         )
         assert result.exit_code == 0, result.output
@@ -325,10 +355,14 @@ class TestExportMissingDataset:
         result = runner.invoke(
             app,
             [
-                "--data-dir", str(data_dir),
-                "export", "nonexistent_id",
-                "-f", "json",
-                "-o", str(tmp_path / "out.json"),
+                "--data-dir",
+                str(data_dir),
+                "export",
+                "nonexistent_id",
+                "-f",
+                "json",
+                "-o",
+                str(tmp_path / "out.json"),
             ],
         )
         assert result.exit_code == 1

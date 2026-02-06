@@ -2,31 +2,23 @@
 
 Welcome to the Pygramattic Reports documentation.
 
-## Getting Started
+## User Guides
+*   **[Installation](/docs/install.md)**: Get up and running.
+*   **[Setup & Configuration](/docs/setup.md)**: Environment vars and config files.
+*   **[First Run Guide](/docs/first-run.md)**: Creates your first report in 5 minutes.
+*   **[User Guide](/docs/user_guide.md)**: Detailed feature usage.
 
-*   [Installation](/docs/install.md): Prerequisites and installation steps.
-*   [Setup & Configuration](/docs/setup.md): Environment variables, secrets, and config files.
-*   [First Run](/docs/first-run.md): Step-by-step guide to generating your first report.
-
-## Architecture & Design
-
-*   [Implementation](/docs/implementation.md): System architecture, module boundaries, and design patterns.
-*   [Data Schema](/docs/schema.md): Detailed breakdown of internal data models and database schemas.
-*   [Functionality](/docs/functionality.md): Core workflows, capabilities, and features.
-
-## Comparisons & Reference
-
-*   [API Reference](/docs/api.md): CLI command reference and internal API usage.
-*   [Integrations](/docs/integrations.md): Connecting to Google Drive, databases, and other sources.
+## Technical Reference
+*   **[Functionality](/docs/functionality.md)**: Deep dive into modules and capabilities.
+*   **[Schema](/docs/schema.md)**: Understanding data models and configurations.
+*   **[API Reference](/docs/api.md)**: Python API for developers.
+*   **[Integrations](/docs/integrations.md)**: Connecting to Pandas, Google, etc.
+*   **[Architecture](/docs/implementation.md)**: Internal design and patterns.
 
 ## Operations & Quality
-
-*   [Testing](/docs/testing.md): How to run and write tests.
-*   [Coverage](/docs/coverage.md): Coverage reports and policies.
-*   [Security](/docs/security.md): Authentication, secrets management, and security best practices.
-*   [Troubleshooting](/docs/troubleshooting.md): Common issues and definitions.
-
-## Community
-
-*   [Contributing](/docs/contributing.md): Guidelines for contributors.
-*   [Changelog](/docs/changelog.md): Version history and release notes.
+*   **[Testing](/docs/testing.md)**: How to run and write tests.
+*   **[Coverage](/docs/coverage.md)**: Coverage metrics and goals.
+*   **[Security](/docs/security.md)**: Auth and safety.
+*   **[Troubleshooting](/docs/troubleshooting.md)**: Fixing common issues.
+*   **[Contributing](/docs/contributing.md)**: Join the project.
+*   **[Changelog](/docs/changelog.md)**: History of changes.

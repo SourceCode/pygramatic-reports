@@ -23,6 +23,9 @@ class MarkdownAdapter(BaseOutputAdapter):
 
     Produces clean, readable Markdown with:
 
+    - YAML Frontmatter (metadata)
+    - Cover Page (Title Block)
+    - Table of Contents
     - Proper heading levels
     - Formatted data tables
     - Image references for charts
@@ -52,8 +55,18 @@ class MarkdownAdapter(BaseOutputAdapter):
         _ = theme  # reserved for future Markdown styling
         lines: list[str] = []
 
+        # 1. Frontmatter
+        if report.metadata:
+            lines.append(self._render_frontmatter(report))
+
         for i, section in enumerate(report.sections):
-            section_md = self._render_section(section, i)
+            # Special handling for TOC which needs access to full report structure
+            section_md: str | None = None
+            if section.section_type == SectionType.TABLE_OF_CONTENTS:
+                section_md = self._render_toc(report, section)
+            else:
+                section_md = self._render_section(section, i)
+
             if section_md is not None:
                 lines.append(section_md)
                 lines.append("")  # blank line between sections
@@ -103,12 +116,38 @@ class MarkdownAdapter(BaseOutputAdapter):
 
     # -- Section renderers ----------------------------------------------------
 
+    def _render_frontmatter(self, report: Report) -> str:
+        """Render document metadata as YAML frontmatter."""
+        meta = report.metadata
+        if not meta:
+            return ""
+
+        lines = ["---"]
+        if meta.title:
+            lines.append(f'title: "{meta.title}"')
+        if meta.author:
+            lines.append(f'author: "{meta.author}"')
+        if meta.subject:
+            lines.append(f'subject: "{meta.subject}"')
+        if meta.version:
+            lines.append(f'version: "{meta.version}"')
+        if meta.keywords:
+            kws = ", ".join(meta.keywords)
+            lines.append(f"keywords: [{kws}]")
+        lines.append("---\n")
+        return "\n".join(lines)
+
     def _render_section(
-        self, section: ReportSection, index: int,
+        self,
+        section: ReportSection,
+        index: int,
     ) -> str | None:
         """Render a single section to Markdown."""
         st = section.section_type
         text = section.content or section.title or ""
+
+        if st == SectionType.COVER_PAGE:
+            return self._render_cover_page(section)
 
         if st in (SectionType.TITLE, SectionType.HEADING):
             level = 1 if st == SectionType.TITLE else min(section.level, 6)
@@ -123,12 +162,64 @@ class MarkdownAdapter(BaseOutputAdapter):
         if st in (SectionType.CHART, SectionType.IMAGE):
             return self._render_media(section, index)
 
+        # Phase 3 Layouts
+        if st == SectionType.LIST:
+            return self._render_list(section)
+        if st == SectionType.CALLOUT:
+            return self._render_callout(section)
+        if st == SectionType.METRIC_CARD:
+            return self._render_metric(section)
+        if st == SectionType.CODE_BLOCK:
+            return self._render_code(section)
+        if st == SectionType.QUOTE:
+            return self._render_quote(section)
+        if st == SectionType.COLUMNS:
+            return self._render_columns(section, index)
+
         simple_map = {
             SectionType.PAGE_BREAK: "---",
             SectionType.SPACER: "",
-            SectionType.TABLE_OF_CONTENTS: "*[Table of Contents placeholder]*",
         }
         return simple_map.get(st, text)
+
+    def _render_cover_page(self, section: ReportSection) -> str:
+        """Render cover page as a prominent title block."""
+        spec = section.metadata.get("spec", {})
+        title = spec.get("title", section.title or "Report")
+        subtitle = spec.get("subtitle")
+
+        lines = [f"# {title}"]
+        if subtitle:
+            lines.append(f"\n### {subtitle}")
+
+        if spec.get("logo_path"):
+            lines.append(f"\n![Logo]({spec['logo_path']})")
+
+        lines.append("\n---\n")  # Separator after cover page
+        return "\n".join(lines)
+
+    def _render_toc(self, report: Report, section: ReportSection) -> str:
+        """Generate a Table of Contents from report sections."""
+        title = section.title or "Table of Contents"
+        lines = [f"## {title}\n"]
+
+        for s in report.sections:
+            if s.section_type in (SectionType.TITLE, SectionType.HEADING, SectionType.COVER_PAGE):
+                # We can't link to cover page easily in MD usually, but headings we can
+                # Assume standard GitHub-style anchors: "My Header" -> "#my-header"
+                if not s.title:
+                    continue
+
+                anchor = s.title.lower().replace(" ", "-").replace(".", "")
+                indent = "  " * (max(0, s.level - 1))
+
+                # Exclude TOC itself from TOC
+                if s.section_type == SectionType.TABLE_OF_CONTENTS:
+                    continue
+
+                lines.append(f"{indent}- [{s.title}](#{anchor})")
+
+        return "\n".join(lines)
 
     @staticmethod
     def _render_text(section: ReportSection) -> str:
@@ -163,8 +254,65 @@ class MarkdownAdapter(BaseOutputAdapter):
 
         return heading + "\n".join([header_line, sep_line, *data_lines])
 
+    def _render_list(self, section: ReportSection) -> str:
+        """Render a list section."""
+        items = section.list_data or []
+        heading = f"## {section.title}\n\n" if section.title else ""
+        list_lines = [f"- {item}" for item in items]
+        return heading + "\n".join(list_lines)
+
+    def _render_callout(self, section: ReportSection) -> str:
+        """Render a callout as an alert block."""
+        data = section.callout_data or {}
+        kind = data.get("type", "note").upper()
+        content = data.get("content", "")
+        # GitHub Alert Syntax
+        return f"> [!{kind}]\n> {content}"
+
+    def _render_metric(self, section: ReportSection) -> str:
+        """Render a metric card as a small table."""
+        data = section.card_data or {}
+        label = data.get("label", "Metric")
+        value = data.get("value", "-")
+        unit = data.get("unit", "")
+        # Render as a simple table for MD
+        return f"| {label} |\n| --- |\n| **{value}{unit}** |"
+
+    def _render_code(self, section: ReportSection) -> str:
+        """Render a code block."""
+        data = section.code_data or {}
+        lang = data.get("language", "")
+        code = data.get("code", "")
+        return f"```{lang}\n{code}\n```"
+
+    def _render_quote(self, section: ReportSection) -> str:
+        """Render a blockquote."""
+        data = section.quote_data or {}
+        text = data.get("text", "")
+        author = data.get("author")
+        quote = f"> {text}"
+        if author:
+            quote += f"\n> \n> — *{author}*"
+        return quote
+
+    def _render_columns(self, section: ReportSection, index: int) -> str:
+        """Render columns sequentially (flattened for MD)."""
+        # Markdown doesn't support real columns, so we render them stacked
+        cols = section.columns_data or []
+        parts = []
+        if section.title:
+            parts.append(f"## {section.title}\n")
+
+        for i, col in enumerate(cols):
+            # Render sub-section logic simplified
+            parts.append(self._render_section(col, index + 1000 + i) or "")
+
+        return "\n".join(parts)
+
     def _render_media(
-        self, section: ReportSection, index: int,
+        self,
+        section: ReportSection,
+        index: int,
     ) -> str:
         """Render a chart/image as a Markdown image reference."""
         title = section.title or "Chart"
@@ -189,7 +337,8 @@ class MarkdownAdapter(BaseOutputAdapter):
 
     @staticmethod
     def _is_numeric_column(
-        rows: list[list[object]], col_idx: int,
+        rows: list[list[object]],
+        col_idx: int,
     ) -> bool:
         """Check if a column contains numeric values."""
         for row in rows:

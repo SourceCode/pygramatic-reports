@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-import yaml
-from typing import TYPE_CHECKING, Any
-from pathlib import Path
-from datetime import datetime
 import uuid
+from datetime import datetime
+from typing import TYPE_CHECKING
+
+import yaml
 
 from pygramattic_reports.exceptions import LoaderError
 from pygramattic_reports.loaders.base import BaseLoader
-from pygramattic_reports.models.raw_data import RawData, ContentType
+from pygramattic_reports.models.raw_data import ContentType, RawData
 
 if TYPE_CHECKING:
     from pygramattic_reports.models import SourceConfig
@@ -45,18 +45,18 @@ class YamlLoader(BaseLoader):
                 content = yaml.safe_load(f)
 
             # Determine content type based on structure
-            content_type = ContentType.DOCUMENT # Default
+            content_type = ContentType.DOCUMENT  # Default
             tabular_data = None
             tabular_headers = None
             row_count = None
-            
+
             # Rudimentary detection: list of dicts -> tabular
             if isinstance(content, list) and len(content) > 0 and isinstance(content[0], dict):
                 content_type = ContentType.TABULAR
                 tabular_data = content
                 tabular_headers = list(content[0].keys())
                 row_count = len(content)
-            
+
             return RawData(
                 id=str(uuid.uuid4()),
                 source_config=config,

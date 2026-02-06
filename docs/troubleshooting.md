@@ -1,40 +1,35 @@
 # Troubleshooting
 
-Common issues and how to resolve them.
-
 ## Common Errors
 
-### `FileNotFoundError: [Errno 2] No such file or directory`
-*   **Cause**: The input file path specified in `ingest` or `config.yaml` is incorrect.
-*   **Fix**: Verify the file path is absolute or relative to your current working directory.
+### 1. `FileNotFoundError` during ingestion
+*   **Cause**: The path in `config.yaml` is relative to where you ran the command, not the config file.
+*   **Fix**: Use absolute paths or be mindful of your current working directory (CWD).
 
-### `ValidationError: Field 'source' required`
-*   **Cause**: The input data does not match the expected schema or is missing required columns.
-*   **Fix**: Check your source file headers. Ensure normalizers are correctly mapped.
+### 2. `TemplateNotFound`
+*   **Cause**: The value in `template: "my_template"` does not match any file in `templates/my_template.yaml`.
+*   **Fix**: Check the `TEMPLATE_DIR` env var and file extensions.
 
-### `GoogleAuthError: Invalid Credentials`
-*   **Cause**: `GOOGLE_APPLICATION_CREDENTIALS` env var is missing or points to an invalid/expired key.
-*   **Fix**: Re-download your Service Account JSON key and update the environment variable.
+### 3. "Matplotlib display" errors
+*   **Cause**: Running on a server without an X11 window system.
+*   **Fix**: `export MPLBACKEND=Agg`
 
-### `TemplateNotFound: 'report.html'`
-*   **Cause**: The template specified in config does not exist in `src/pygramattic_reports/templates`.
-*   **Fix**: Check the template name in your config.
+### 4. "Data Validation Error"
+*   **Cause**: Your data failed strict validation rules (e.g., uniqueness, non-null).
+*   **Fix**: Clean your input data or relax the validation rules in the template section.
 
 ## Debugging
 
-Enable verbose logging to see detailed traces:
+Use the detailed logging to trace execution:
 
 ```bash
-report --verbose build ...
+LOG_LEVEL=DEBUG report build ...
 ```
 
-This will print stack traces and debug information to the console.
+This will print which files are loaded, which template sections are being processed, and the shape of the dataframes at each step.
 
-## Resetting Data
+## Resetting State
 
-If your `data/` directory gets corrupted state, you can safely delete `data/processed` and `data/derived` and re-run ingestion.
-
-```bash
-rm -rf data/processed/* data/derived/*
-report ingest ...
-```
+The application is largely stateless. If you suspect caching issues:
+1.  Clear the `__pycache__` directories.
+2.  (Future) Clear any local `./.cache` folders if configured.

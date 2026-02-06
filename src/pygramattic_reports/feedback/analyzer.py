@@ -115,44 +115,43 @@ class FeedbackAnalyzer:
         recommendations: list[FeedbackRecommendation] = []
 
         for entry in diff.entries:
-            if (
-                entry.change_type == "modified"
-                and len(entry.edited) < len(entry.original) * 0.7
-            ):
-                recommendations.append(FeedbackRecommendation(
-                    category="conciseness",
-                    section=entry.section,
-                    description=(
-                        "Content was shortened significantly. "
-                        "Consider reducing verbosity in future generation."
-                    ),
-                    priority="medium",
-                ))
+            if entry.change_type == "modified" and len(entry.edited) < len(entry.original) * 0.7:
+                recommendations.append(
+                    FeedbackRecommendation(
+                        category="conciseness",
+                        section=entry.section,
+                        description=(
+                            "Content was shortened significantly. "
+                            "Consider reducing verbosity in future generation."
+                        ),
+                        priority="medium",
+                    )
+                )
 
-            if (
-                entry.change_type == "modified"
-                and len(entry.edited) > len(entry.original) * 1.5
-            ):
-                recommendations.append(FeedbackRecommendation(
-                    category="detail",
-                    section=entry.section,
-                    description=(
-                        "Content was expanded. "
-                        "Consider adding more detail in future generation."
-                    ),
-                    priority="medium",
-                ))
+            if entry.change_type == "modified" and len(entry.edited) > len(entry.original) * 1.5:
+                recommendations.append(
+                    FeedbackRecommendation(
+                        category="detail",
+                        section=entry.section,
+                        description=(
+                            "Content was expanded. "
+                            "Consider adding more detail in future generation."
+                        ),
+                        priority="medium",
+                    )
+                )
 
             if entry.change_type == "removed":
-                recommendations.append(FeedbackRecommendation(
-                    category="structure",
-                    section=entry.section,
-                    description=(
-                        "Content was removed. "
-                        "Consider whether this section is needed."
-                    ),
-                    priority="low",
-                ))
+                recommendations.append(
+                    FeedbackRecommendation(
+                        category="structure",
+                        section=entry.section,
+                        description=(
+                            "Content was removed. Consider whether this section is needed."
+                        ),
+                        priority="low",
+                    )
+                )
 
         return recommendations
 

@@ -55,10 +55,7 @@ class NumericalValidator:
         Returns:
             List of ValidationCheck results.
         """
-        return [
-            self._verify_claim(claim, datasets)
-            for claim in report.number_claims
-        ]
+        return [self._verify_claim(claim, datasets) for claim in report.number_claims]
 
     def _verify_claim(
         self,
@@ -71,9 +68,7 @@ class NumericalValidator:
             return ValidationCheck(
                 check_name=f"number_claim_{claim.description}",
                 status=CheckStatus.SKIP,
-                message=(
-                    f"Source dataset {claim.source_dataset_id} not found"
-                ),
+                message=(f"Source dataset {claim.source_dataset_id} not found"),
                 section_index=claim.section_index,
             )
 
@@ -101,10 +96,7 @@ class NumericalValidator:
             return ValidationCheck(
                 check_name=f"number_claim_{claim.description}",
                 status=CheckStatus.PASS,
-                message=(
-                    f"{claim.description}: "
-                    f"{claim.formatted_value} matches source"
-                ),
+                message=(f"{claim.description}: {claim.formatted_value} matches source"),
                 expected=str(expected),
                 actual=str(claim.value),
                 section_index=claim.section_index,
@@ -112,10 +104,7 @@ class NumericalValidator:
         return ValidationCheck(
             check_name=f"number_claim_{claim.description}",
             status=CheckStatus.FAIL,
-            message=(
-                f"{claim.description}: "
-                f"expected {expected}, got {claim.value}"
-            ),
+            message=(f"{claim.description}: expected {expected}, got {claim.value}"),
             expected=str(expected),
             actual=str(claim.value),
             section_index=claim.section_index,

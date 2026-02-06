@@ -25,7 +25,66 @@ class SectionType(StrEnum):
     HEADING = "heading"
     SPACER = "spacer"
     PAGE_BREAK = "page_break"
+    # Phase 2
     TABLE_OF_CONTENTS = "table_of_contents"
+    COVER_PAGE = "cover_page"
+    # Phase 3
+    LIST = "list"
+    CALLOUT = "callout"
+    METRIC_CARD = "metric_card"
+    CODE_BLOCK = "code_block"
+    QUOTE = "quote"
+    COLUMNS = "columns"
+
+
+class DocumentMetadata(BaseModel):
+    """Metadata about the report document."""
+
+    model_config = ConfigDict(frozen=True)
+
+    title: str | None = None
+    author: str | None = None
+    subject: str | None = None
+    keywords: list[str] = []
+    version: str | None = None
+    created_at: datetime | None = None
+
+
+class PageLayout(BaseModel):
+    """Page layout configuration."""
+
+    model_config = ConfigDict(frozen=True)
+
+    orientation: str = "portrait"  # "portrait", "landscape"
+    margin_top_inches: float = 1.0
+    margin_bottom_inches: float = 1.0
+    margin_left_inches: float = 1.0
+    margin_right_inches: float = 1.0
+    page_numbers: bool = True
+
+
+class RunningElement(BaseModel):
+    """Header or footer template configuration."""
+
+    model_config = ConfigDict(frozen=True)
+
+    left: str | None = None
+    center: str | None = None
+    right: str | None = None
+    font_size: int = 9
+
+
+class CoverPageSpec(BaseModel):
+    """Cover page configuration."""
+
+    model_config = ConfigDict(frozen=True)
+
+    title: str | None = None
+    subtitle: str | None = None
+    logo_path: str | None = None
+    background_color: str | None = None
+    show_date: bool = True
+    custom_text: str | None = None
 
 
 class ReportSection(BaseModel):
@@ -61,6 +120,14 @@ class ReportSection(BaseModel):
     media_path: str | None = None
     level: int = 1
     metadata: dict[str, Any] = {}
+
+    # Phase 3 Layout Data
+    list_data: list[str] | list[dict[str, Any]] | None = None
+    card_data: dict[str, Any] | None = None
+    callout_data: dict[str, str] | None = None
+    code_data: dict[str, str] | None = None  # {language, code}
+    quote_data: dict[str, str] | None = None  # {text, author}
+    columns_data: list[ReportSection] | None = None  # Nested sections
 
 
 class NumberClaim(BaseModel):
@@ -107,6 +174,11 @@ class Report(BaseModel):
         theme_name: Name of the theme applied.
         build_timestamp: When the report was built.
         build_warnings: Non-fatal issues encountered during build.
+        metadata: Document-level metadata.
+        page_layout: Page layout settings.
+        cover_page: Optional cover page configuration.
+        header: Optional page header configuration.
+        footer: Optional page footer configuration.
     """
 
     model_config = ConfigDict(frozen=True)
@@ -120,3 +192,10 @@ class Report(BaseModel):
     theme_name: str
     build_timestamp: datetime
     build_warnings: list[str] = []
+
+    # Phase 2 Enhancements
+    metadata: DocumentMetadata | None = None
+    page_layout: PageLayout = PageLayout()
+    cover_page: CoverPageSpec | None = None
+    header: RunningElement | None = None
+    footer: RunningElement | None = None

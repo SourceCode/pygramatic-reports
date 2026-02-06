@@ -11,11 +11,18 @@ from typing import TYPE_CHECKING, Any
 from pygramattic_reports.exceptions import BuildError, ErrorSeverity, PygramatticError
 from pygramattic_reports.logging import BuildLog, get_logger
 from pygramattic_reports.models import (
+    CoverPageSpec,
+    DocumentMetadata,
+    PageLayout,
     Report,
+    ReportSection,
+    RunningElement,
     SectionSource,
+    SectionType,
     generate_id,
     now_utc,
 )
+from pygramattic_reports.processors.data_processor import DataProcessor
 
 from .section_processors import (
     process_ai_placeholder_section,
@@ -28,10 +35,11 @@ if TYPE_CHECKING:
     from pygramattic_reports.ai import ClaudeClient
     from pygramattic_reports.charts import ChartEngine
     from pygramattic_reports.models import (
+        Dataset,
         NumberClaim,
-        ReportSection,
         TemplateSectionSpec,
     )
+    from pygramattic_reports.processors.data_processor import DataProcessor
     from pygramattic_reports.templates import TemplateRenderer
 
     from .ai_processor import AISectionProcessor
@@ -56,15 +64,6 @@ class ReportBuilder:
 
     4. Collect all sections into a Report object
     5. Track number claims for validation
-
-    Usage::
-
-        builder = ReportBuilder(
-            chart_engine=ChartEngine(),
-            template_renderer=TemplateRenderer(),
-            claude_client=client,  # optional
-        )
-        report, build_log = builder.build(build_config)
     """
 
     def __init__(
@@ -77,9 +76,11 @@ class ReportBuilder:
         self.chart_engine = chart_engine
         self.template_renderer = template_renderer
         self.claude_client = claude_client
+        self.data_processor = DataProcessor()
 
     def build(
-        self, config: BuildConfig,
+        self,
+        config: BuildConfig,
     ) -> tuple[Report, BuildLog]:
         """Build a report from the given configuration.
 
@@ -94,23 +95,63 @@ class ReportBuilder:
             BuildError: If the build fails fatally.
         """
         build_log = BuildLog(
-            build_id=generate_id(), started_at=now_utc(),
+            build_id=generate_id(),
+            started_at=now_utc(),
         )
 
         ai_processor = self._create_ai_processor(config)
 
         context = self._build_context(config)
         resolved_sections = self.template_renderer.resolve_template(
-            config.template, context,
+            config.template,
+            context,
         )
 
         report_sections: list[ReportSection] = []
         number_claims: list[NumberClaim] = []
 
+        # --- Phase 2: Metadata & Structure Extraction ---
+        metadata_dict = config.template.metadata or {}
+        # Merge build config version if not present
+        if "version" not in metadata_dict:
+            metadata_dict["version"] = config.template.version
+
+        doc_metadata = DocumentMetadata(
+            title=metadata_dict.get("title", config.report_name),
+            author=metadata_dict.get("author"),
+            subject=metadata_dict.get("subject"),
+            keywords=metadata_dict.get("keywords", []),
+            version=metadata_dict.get("version"),
+            created_at=now_utc(),
+        )
+
+        # Extract layout configs
+        page_layout = PageLayout(**(config.template.page_layout or {}))
+        cover_page = None
+        if config.template.cover_page:
+            cover_page = CoverPageSpec(**config.template.cover_page)
+            # Inject Cover Page Section
+            report_sections.append(
+                ReportSection(
+                    section_type=SectionType.COVER_PAGE,
+                    title="Cover Page",
+                    metadata={"spec": cover_page.model_dump()},
+                )
+            )
+
+        header = RunningElement(**config.template.header) if config.template.header else None
+        footer = RunningElement(**config.template.footer) if config.template.footer else None
+
+        # --- Section Processing ---
+
         for i, section_spec in enumerate(resolved_sections):
             try:
                 section, claims = self._process_section(
-                    section_spec, config, i, build_log, ai_processor,
+                    section_spec,
+                    config,
+                    i,
+                    build_log,
+                    ai_processor,
                 )
                 report_sections.append(section)
                 number_claims.extend(claims)
@@ -123,7 +164,8 @@ class ReportBuilder:
                         error=str(exc),
                     )
                     build_log.add_entry(
-                        "warning", "builder",
+                        "warning",
+                        "builder",
                         f"Section {i} skipped: {exc}",
                     )
                     build_log.sections_skipped += 1
@@ -131,11 +173,7 @@ class ReportBuilder:
                     build_log.finalize("failed")
                     raise
 
-        status = (
-            "completed"
-            if build_log.sections_skipped == 0
-            else "completed_with_warnings"
-        )
+        status = "completed" if build_log.sections_skipped == 0 else "completed_with_warnings"
         build_log.finalize(status)
 
         report = Report(
@@ -143,17 +181,17 @@ class ReportBuilder:
             name=config.report_name,
             sections=report_sections,
             number_claims=number_claims,
-            datasets_used=[
-                ds.id for ds in config.datasets.values()
-            ],
+            datasets_used=[ds.id for ds in config.datasets.values()],
             template_name=config.template.name,
             theme_name=config.theme.name,
             build_timestamp=now_utc(),
-            build_warnings=[
-                e.message
-                for e in build_log.entries
-                if e.level == "warning"
-            ],
+            build_warnings=[e.message for e in build_log.entries if e.level == "warning"],
+            # Phase 2 Fields
+            metadata=doc_metadata,
+            page_layout=page_layout,
+            cover_page=cover_page,
+            header=header,
+            footer=footer,
         )
 
         return report, build_log
@@ -186,26 +224,83 @@ class ReportBuilder:
         ai_processor: AISectionProcessor | None,
     ) -> tuple[ReportSection, list[NumberClaim]]:
         """Process a single section based on its source type."""
+        # Handle structural types that don't need processors
+        if spec.type == "table_of_contents":
+            return ReportSection(
+                section_type=SectionType.TABLE_OF_CONTENTS,
+                title=spec.title or "Table of Contents",
+                level=spec.level,
+            ), []
+
         if spec.source == SectionSource.STATIC:
             return process_static_section(spec)
 
         if spec.source == SectionSource.DATA:
             dataset = self._resolve_dataset(spec, config)
+            # Transform data if needed
+            processed_df = self.data_processor.process(dataset, spec)
+            if processed_df is not dataset.dataframe:
+                dataset = self._wrap_dataframe(dataset, processed_df)
+
             return process_data_table_section(spec, dataset, index)
 
         if spec.source == SectionSource.CHART:
             dataset = self._resolve_dataset(spec, config)
+            # Transform data if needed
+            processed_df = self.data_processor.process(dataset, spec)
+            if processed_df is not dataset.dataframe:
+                dataset = self._wrap_dataframe(dataset, processed_df)
+
             return process_chart_section(
-                spec, dataset, config.theme, self.chart_engine,
+                spec,
+                dataset,
+                config.theme,
+                self.chart_engine,
             )
 
         if spec.source == SectionSource.AI_GENERATED:
             return self._process_ai_section(
-                spec, config, build_log, ai_processor,
+                spec,
+                config,
+                build_log,
+                ai_processor,
             )
 
         msg = f"Unknown section source: {spec.source}"  # type: ignore[unreachable]
         raise BuildError(msg)
+
+    def _wrap_dataframe(self, original: Dataset, new_df: Any) -> Dataset:
+        """Wrap a transformed dataframe in a new Dataset object.
+
+        Args:
+            original: The original Dataset object.
+            new_df: The transformed pandas DataFrame.
+
+        Returns:
+            A new Dataset instance with the transformed data.
+        """
+        from pygramattic_reports.models import Dataset, Provenance
+
+        # In a real implementation, we would regenerate the schema here
+        # to match the new columns/dtypes. For now, we reuse the original
+        # schema filtering for columns that still exist.
+        new_schema = [col for col in original.schema if col.name in new_df.columns]
+
+        return Dataset(
+            id=f"{original.id}_processed",
+            name=f"{original.name} (Processed)",
+            schema=new_schema,
+            dataframe=new_df,
+            provenance=Provenance(
+                source_type="transformation",
+                source_name=original.provenance.source_name,
+                loaded_at=original.provenance.loaded_at,
+                normalized_at=now_utc(),
+                row_count_raw=len(new_df),
+                transformations=original.provenance.transformations + ["processed"],
+            ),
+            created_at=now_utc(),
+        )
 
     def _process_ai_section(
         self,
@@ -244,26 +339,20 @@ class ReportBuilder:
             report_name=config.report_name,
         )
 
-    @staticmethod
     def _resolve_dataset(
+        self,
         spec: TemplateSectionSpec,
         config: BuildConfig,
     ) -> Any:  # noqa: ANN401
         """Resolve a dataset reference from section spec."""
         ds_name = spec.dataset or config.primary_dataset
         if not ds_name:
-            msg = (
-                f"Section '{spec.title or spec.type}' requires "
-                f"a dataset but none specified"
-            )
+            msg = f"Section '{spec.title or spec.type}' requires a dataset but none specified"
             raise BuildError(msg)
 
         dataset = config.datasets.get(ds_name)
         if dataset is None:
-            msg = (
-                f"Dataset '{ds_name}' not found. "
-                f"Available: {list(config.datasets.keys())}"
-            )
+            msg = f"Dataset '{ds_name}' not found. Available: {list(config.datasets.keys())}"
             raise BuildError(msg)
         return dataset
 

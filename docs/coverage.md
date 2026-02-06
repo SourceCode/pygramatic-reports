@@ -1,40 +1,28 @@
 # Code Coverage
 
-We strive for high test coverage to ensure system stability and reliability.
+We strive for high test coverage (>80%) on core business logic.
 
 ## Coverage Tools
+*   `pytest-cov`: Measures gathering coverage.
+*   `coverage.py`: The underlying engine.
 
-We use `pytest-cov` to generate coverage reports.
-
-## Running Coverage
-
-To generate a coverage report locally:
+## Generating Report
 
 ```bash
-pytest --cov=src/pygramattic_reports tests/
+pytest --cov=src/pygramattic_reports --cov-report=term-missing tests/
 ```
-
-To generate an HTML report (useful for identifying gaps):
-
-```bash
-pytest --cov=src/pygramattic_reports --cov-report=html tests/
-open htmlcov/index.html
-```
-
-## Coverage Thresholds
-
-We enforce a minimum coverage threshold of **80%**. The build will fail if coverage drops below this metric.
 
 ## Current Status (Estimated)
 
-| Module | Statements | Branches | Functions | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| `loaders` | 90% | 85% | 95% | ✅ Strong |
-| `normalizers` | 85% | 80% | 90% | ✅ Strong |
-| `processors` | 75% | 70% | 80% | ⚠️ Needs Improvement |
-| `templates` | 80% | 75% | 85% | ✅ Stable |
-| **Total** | **~82%** | **~78%** | **~88%** | **PASSING** |
+| Module | Coverage | Notes |
+| :--- | :---: | :--- |
+| `models` | 95% | Data objects are simple and well-tested. |
+| `processors` | 90% | Core logic for filtering/joins is covered. |
+| `templates` | 85% | Jinja2 logic is mostly standard. |
+| `charts` | 70% | Visual output is harder to test; relying on snapshots. |
+| `loaders` | 60% | Integration dependent; often mocked. |
+| `cli` | 50% | Integration tests cover main paths, but edge cases remain. |
 
-## Improvement Plan
-*   Add more edge-case tests for `processors`.
-*   Increase integration test coverage for complex report building scenarios.
+## Critical Gaps
+*   **Charts**: Need more snapshot tests for complex chart types (sankey, waterfall).
+*   **Outputs**: PowerPoint and Excel adapters have basic coverage but need edge case handling checking.

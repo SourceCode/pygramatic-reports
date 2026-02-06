@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-import pandas as pd
-from typing import TYPE_CHECKING, Any
-from pathlib import Path
-from datetime import datetime
 import uuid
+from datetime import datetime
+from typing import TYPE_CHECKING, Any
+
+import pandas as pd
 
 from pygramattic_reports.exceptions import LoaderError
 from pygramattic_reports.loaders.base import BaseLoader
-from pygramattic_reports.models.raw_data import RawData, ContentType
+from pygramattic_reports.models.raw_data import ContentType, RawData
 
 if TYPE_CHECKING:
     from pygramattic_reports.models import SourceConfig
@@ -34,7 +34,7 @@ class ParquetLoader(BaseLoader):
         if not config.file:
             msg = "SourceConfig.file is required for ParquetLoader"
             raise LoaderError(msg, path=str(config.source_type))
-            
+
         path = config.file.path
         if not path.exists():
             msg = f"Parquet file not found: {path}"
@@ -43,17 +43,16 @@ class ParquetLoader(BaseLoader):
         try:
             # Using pandas to read parquet is efficient and handles pyarrow deps
             df = pd.read_parquet(path)
-            
+
             # Convert NaN to None for JSON compliance
             # cast to object to allow mixed types (None + float)
             df = df.astype(object).where(pd.notnull(df), None)  # type: ignore[arg-type]
-            
+
             # Helper to ensure keys are strings
             records: list[dict[str, Any]] = [
-                {str(k): v for k, v in record.items()} 
-                for record in df.to_dict(orient="records")
+                {str(k): v for k, v in record.items()} for record in df.to_dict(orient="records")
             ]
-            
+
             return RawData(
                 id=str(uuid.uuid4()),
                 source_config=config,
@@ -62,7 +61,7 @@ class ParquetLoader(BaseLoader):
                 tabular_headers=[str(c) for c in df.columns],
                 row_count=len(df),
                 loaded_at=datetime.now(),
-                source_checksum=None, # Checksum support could be added later
+                source_checksum=None,  # Checksum support could be added later
             )
         except Exception as e:
             msg = f"Failed to load Parquet file: {path}. Error: {e}"

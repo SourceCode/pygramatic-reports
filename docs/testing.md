@@ -1,40 +1,44 @@
 # Testing Strategy
 
-We employ a comprehensive testing strategy using `pytest`.
+We rely on `pytest` for a comprehensive testing suite.
 
-## Test Structure
+## Test Levels
 
-Tests are located in the `tests/` directory:
+### Unit Tests (`tests/unit/`)
+*   **Focus**: Individual functions and methods.
+*   **Mocking**: Heavy use of `unittest.mock` to isolate from disk and network.
+*   **Speed**: Fast execution (< 2s).
 
-*   `tests/unit/`: Fast, isolated tests for individual functions and classes. logic.
-*   `tests/integration/`: Tests that verify interactions between modules (e.g., Loader -> Normalizer).
-*   `tests/fixtures/`: Reusable test data and Pytest fixtures.
+### Integration Tests (`tests/integration/`)
+*   **Focus**: Interaction between `Loader`, `Builder`, and `OutputAdapter`.
+*   **Data**: Uses real sample files in `data/`.
+*   **Goal**: Verify that a full report can be built from checking constraints.
+
+### Snapshot Tests (`tests/snapshots/`)
+*   **Tool**: `syrupy` (pytest plugin).
+*   **Focus**: Visual regression for HTML and Chart output.
+*   **Goal**: Ensure changes to the engine don't accidentally break layout.
 
 ## Running Tests
 
-### Unit Tests
-Run unit tests to verify logic in isolation:
-
 ```bash
-pytest tests/unit
-```
-
-### Integration Tests
-Run integration tests to verify component interaction:
-
-```bash
-pytest tests/integration
-```
-
-### Full Suite
-Run all tests:
-
-```bash
+# Run all tests
 pytest
+
+# Run only unit tests
+pytest tests/unit
+
+# Run with coverage (slow)
+pytest --cov=src/pygramattic_reports tests/
 ```
 
-## Test Data
-We use fixtures defined in `tests/conftest.py` and `tests/fixtures/` to provide specific data inputs (mock CSVs, JSONs) to tests.
+## writing Tests
 
-## Continuous Integration
-Tests are automatically run on every Pull Request via GitHub Actions. Merging to `main` is blocked if tests fail.
+We use `pytest` fixtures for common setups.
+
+```python
+def test_data_processor(basic_dataset):
+    processor = DataProcessor()
+    result = processor.process(basic_dataset, ...)
+    assert len(result) == 5
+```

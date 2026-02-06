@@ -1,69 +1,74 @@
 # First Run Guide
 
-This guide will walk you through generating your first report using Pygramattic Reports.
+This guide walks you through the "Golden Path" of generating your first report from scratch.
 
 ## 1. Initialize Project
 
-Navigate to your workspace and initialize a new report project:
+Create a standardized directory structure for your reporting project.
 
 ```bash
-mkdir my-first-report
-cd my-first-report
-report init
+mkdir my-reports
+cd my-reports
+report init .
 ```
 
-This will create the necessary directory structure (`data/`, `config/`) and a default `config.yaml`.
+This creates:
+*   `config.yaml` (default configuration)
+*   `data/` (folder for inputs)
+*   `templates/` (sample templates)
+*   `themes/` (sample themes)
 
-## 2. Prepare Data
+## 2. Ingest Data
 
-Place a sample CSV file in `data/raw/`. For this example, let's create a simple sales file:
+Place a sample CSV file in the data directory.
 
 ```bash
-echo "date,product,amount\n2023-01-01,Widget A,100\n2023-01-02,Widget B,150" > data/raw/sales.csv
+# Create dummy data
+echo "product,amount,date
+Widget A,100,2023-01-01
+Widget B,200,2023-01-02" > data/sample.csv
 ```
 
-## 3. Configure Report
+## 3. Configure the Job
 
-Edit `config.yaml` to point to your data:
+Edit `config.yaml` to point to your new data:
 
 ```yaml
-inputs:
-  - type: "csv"
-    path: "data/raw/sales.csv"
-    name: "sales_data"
-
-template: "standard_report"
+template: "default_summary"
+theme: "default"
+datasets:
+  main: "data/sample.csv"
 ```
 
-## 4. Ingest Data
+## 4. Build Report
 
-Run the ingestion command to normalize your data:
-
-```bash
-report ingest data/raw/sales.csv
-```
-
-You should see output confirming the file was processed and saved to `data/processed/`.
-
-## 5. Build Report
-
-Generate the final report:
+Run the build command:
 
 ```bash
 report build --config config.yaml
 ```
 
-The report will be generated in `data/reports/` (e.g., `data/reports/report_2023-10-27.md`).
+**Output**:
+*   `output/report.html`: The rendered HTML report.
+*   `output/report.pdf`: (If enabled) PDF version.
 
-## 6. Verify Output
+## 5. View Result
 
-Open the generated report to verify the contents:
+Open the generated HTML file in your browser:
 
 ```bash
-cat data/reports/*.md
+# macOS
+open output/report.html
+
+# Linux
+xdg-open output/report.html
+
+# Windows
+start output/report.html
 ```
 
 ## Next Steps
 
-*   Explore [Functionality](/docs/functionality.md) to learn about advanced features.
-*   Check [Integrations](/docs/integrations.md) to connect Google Drive.
+*   Learn about **[Templates](/docs/functionality.md)** to customize the layout.
+*   Explore **[Themes](/docs/functionality.md)** to change the styling.
+*   See **[API Reference](/docs/api.md)** for programmatic generation.

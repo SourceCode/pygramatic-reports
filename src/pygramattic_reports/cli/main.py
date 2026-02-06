@@ -78,6 +78,7 @@ from .export_cmd import export  # noqa: E402
 from .feedback_cmd import feedback  # noqa: E402
 from .ingest import ingest  # noqa: E402
 from .init_cmd import init  # noqa: E402
+from .inspect_cmd import inspect_app  # noqa: E402
 from .list_cmd import list_resources  # noqa: E402
 from .validate_cmd import validate  # noqa: E402
 
@@ -87,4 +88,5 @@ app.command()(init)
 app.command()(build)
 app.command()(export)
 app.command()(validate)
+app.add_typer(inspect_app)
 app.command()(feedback)

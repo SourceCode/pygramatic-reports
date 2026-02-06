@@ -62,7 +62,7 @@ VALIDATION_PROMPT = (
     "3. Claims not supported by the data\n"
     "4. Missing important context\n"
     "\n"
-    'Respond with a JSON object:\n'
+    "Respond with a JSON object:\n"
     '{{"valid": true/false, "issues": ["issue1", "issue2", ...]}}'
 )
 
@@ -100,11 +100,7 @@ def format_data_description(
     Returns:
         Formatted description string.
     """
-    return (
-        f"Dataset: {dataset_name}\n"
-        f"Columns: {', '.join(columns)}\n"
-        f"Rows: {row_count}"
-    )
+    return f"Dataset: {dataset_name}\nColumns: {', '.join(columns)}\nRows: {row_count}"
 
 
 def format_key_stats(stats: dict[str, float]) -> str:
@@ -118,3 +114,18 @@ def format_key_stats(stats: dict[str, float]) -> str:
     """
     lines = [f"- {key}: {value}" for key, value in stats.items()]
     return "\n".join(lines)
+
+
+INSIGHT_PROMPT = (
+    "Analyze the following dataset and provide 3 key insights.\\n"
+    "Dataset Context: {context}\\n"
+    "Data:\\n"
+    "{data}\\n"
+)
+
+ANOMALY_PROMPT = (
+    "Identify any anomalies in the following dataset.\\n"
+    "Dataset Context: {context}\\n"
+    "Data:\\n"
+    "{data}\\n"
+)

@@ -15,13 +15,23 @@ if TYPE_CHECKING:
     from pygramattic_reports.models import Dataset
 
 _VALID_OPERATIONS = frozenset({"sum", "avg", "min", "max", "count"})
-_VALID_OPERATORS = frozenset({
-    "eq", "ne", "gt", "gte", "lt", "lte", "contains",
-})
+_VALID_OPERATORS = frozenset(
+    {
+        "eq",
+        "ne",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "contains",
+    }
+)
 
 
 def aggregate(
-    dataset: Dataset, column: str, operation: str,
+    dataset: Dataset,
+    column: str,
+    operation: str,
 ) -> float:
     """Compute an aggregate over a dataset column.
 
@@ -101,7 +111,9 @@ def filter_rows(
 
 
 def percent_change(
-    dataset: Dataset, column: str, periods: int = 1,
+    dataset: Dataset,
+    column: str,
+    periods: int = 1,
 ) -> pd.Series:
     """Compute percent change over periods for a column.
 
@@ -149,7 +161,9 @@ def running_total(dataset: Dataset, column: str) -> pd.Series:
 
 
 def moving_average(
-    dataset: Dataset, column: str, window: int = 3,
+    dataset: Dataset,
+    column: str,
+    window: int = 3,
 ) -> pd.Series:
     """Compute moving average of a column.
 

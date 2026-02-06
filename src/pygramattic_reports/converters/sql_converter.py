@@ -77,9 +77,7 @@ def to_sql(
         parts.append(_create_table(name, dataset.schema, type_map))
 
         if dataset.row_count > 0:
-            parts.extend(
-                _insert_statements(name, dataset, batch_size)
-            )
+            parts.extend(_insert_statements(name, dataset, batch_size))
 
         return "\n".join(parts) + "\n"
     except ConversionError:

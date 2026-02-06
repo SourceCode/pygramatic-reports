@@ -85,8 +85,7 @@ class NarrativeValidator:
     ) -> ValidationCheck:
         """Validate a single narrative section."""
         data_summary = "\n".join(
-            f"{name}: {ds.dataframe.describe().to_string()}"
-            for name, ds in datasets.items()
+            f"{name}: {ds.dataframe.describe().to_string()}" for name, ds in datasets.items()
         )
 
         prompt = VALIDATION_PROMPT.format(
@@ -116,9 +115,7 @@ class NarrativeValidator:
             return ValidationCheck(
                 check_name=f"narrative_accuracy_{index}",
                 status=CheckStatus.PASS,
-                message=(
-                    f"Narrative section {index} is consistent with data"
-                ),
+                message=(f"Narrative section {index} is consistent with data"),
                 section_index=index,
             )
         return ValidationCheck(

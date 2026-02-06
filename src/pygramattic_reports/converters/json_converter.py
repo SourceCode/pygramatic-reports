@@ -76,9 +76,7 @@ def _to_columnar(dataset: Dataset) -> dict[str, list[Any]]:
 
     for col_name in dataset.column_names:
         col_schema = schema_map.get(col_name)
-        columns[col_name] = [
-            _serialize_value(v, col_schema) for v in dataset.dataframe[col_name]
-        ]
+        columns[col_name] = [_serialize_value(v, col_schema) for v in dataset.dataframe[col_name]]
 
     return columns
 

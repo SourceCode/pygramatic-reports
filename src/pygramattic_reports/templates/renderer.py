@@ -6,6 +6,7 @@ template variables to actual data values.
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from jinja2 import (
@@ -96,6 +97,12 @@ class TemplateRenderer:
             keep_trailing_newline=False,
             autoescape=False,  # noqa: S701  # plain text templates, not HTML
         )
+
+        # Register standard filters
+        self._env.filters["currency"] = _filter_currency
+        self._env.filters["percent"] = _filter_percent
+        self._env.filters["date"] = _filter_date
+        self._env.filters["number"] = _filter_number
 
     def render_string(self, template_string: str, context: dict[str, Any]) -> str:
         """Render a single Jinja2 template string with the given context.
@@ -190,3 +197,49 @@ class TemplateRenderer:
                 resolved.append(section)
 
         return resolved
+
+
+# --- Filters ---
+
+
+def _filter_currency(value: float | int | str, symbol: str = "$") -> str:
+    """Format value as currency."""
+    try:
+        val = float(value)
+        return f"{symbol}{val:,.2f}"
+    except (ValueError, TypeError):
+        return str(value)
+
+
+def _filter_percent(value: float | int | str, decimals: int = 1) -> str:
+    """Format value as percentage."""
+    try:
+        val = float(value)
+        # Assuming value is 0.5 for 50%
+        return f"{val:.{decimals}%}"
+    except (ValueError, TypeError):
+        return str(value)
+
+
+def _filter_date(value: Any, format: str = "%Y-%m-%d") -> str:
+    """Format date string or object."""
+    if isinstance(value, str):
+        try:
+            # Simple ISO parse attempt
+            dt_val = datetime.fromisoformat(value)
+            return dt_val.strftime(format)
+        except ValueError:
+            return value
+
+    if isinstance(value, datetime):
+        return value.strftime(format)
+    return str(value)
+
+
+def _filter_number(value: float | int | str, decimals: int = 2) -> str:
+    """Format number with thousands separator."""
+    try:
+        val = float(value)
+        return f"{val:,.{decimals}f}"
+    except (ValueError, TypeError):
+        return str(value)

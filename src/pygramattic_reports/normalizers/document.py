@@ -81,9 +81,7 @@ def _build_provenance(raw_data: RawData) -> Provenance:
         source_type=raw_data.source_config.source_type.value,
         source_name=raw_data.source_config.name,
         source_path=(
-            str(raw_data.source_config.file.path)
-            if raw_data.source_config.file
-            else None
+            str(raw_data.source_config.file.path) if raw_data.source_config.file else None
         ),
         loaded_at=raw_data.loaded_at,
         normalized_at=now_utc(),

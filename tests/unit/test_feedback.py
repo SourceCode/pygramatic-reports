@@ -198,14 +198,16 @@ class TestAiAnalysisMocked:
     def test_ai_recommendations(self) -> None:
         client = MagicMock()
         client.is_available.return_value = True
-        client.generate.return_value = json.dumps([
-            {
-                "category": "tone",
-                "section": "summary",
-                "description": "Use more formal language",
-                "priority": "high",
-            },
-        ])
+        client.generate.return_value = json.dumps(
+            [
+                {
+                    "category": "tone",
+                    "section": "summary",
+                    "description": "Use more formal language",
+                    "priority": "high",
+                },
+            ]
+        )
 
         diff = ReportDiff(
             original_path="a.md",

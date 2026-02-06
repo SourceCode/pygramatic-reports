@@ -136,8 +136,7 @@ def _read_sheet(
         if header_row is None:
             return [], []
         headers = [
-            str(cell) if cell is not None else f"col_{i}"
-            for i, cell in enumerate(header_row)
+            str(cell) if cell is not None else f"col_{i}" for i, cell in enumerate(header_row)
         ]
     else:
         first_row = next(rows_iter, None)

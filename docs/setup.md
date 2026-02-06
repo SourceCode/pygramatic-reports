@@ -1,58 +1,57 @@
 # Setup & Configuration
 
+This guide covers environment variables, configuration files, and secrets management for Pygramattic Reports.
+
 ## Environment Variables
 
-Pygramattic Reports uses environment variables for sensitive configuration and global settings. Create a `.env` file in your project root or set these variables in your shell.
+The application uses `pydantic-settings` to load configuration from environment variables or `.env` files.
 
 | Variable | Required | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `PYGRAMATTIC_ENV` | No | `development` | Runtime environment (`development`, `production`). |
+| :--- | :---: | :--- | :--- |
 | `LOG_LEVEL` | No | `INFO` | Logging verbosity (`DEBUG`, `INFO`, `WARNING`, `ERROR`). |
-| `DATA_DIR` | No | `./data` | Base directory for storing raw and processed data. |
-| `GOOGLE_APPLICATION_CREDENTIALS` | Yes (for Google) | - | Path to Google Service Account JSON key key. |
-| `DB_CONNECTION_STRING` | Yes (for SQL) | - | PostgreSQL connection string (e.g., `postgresql://user:pass@localhost:5432/db`). |
+| `DATA_DIR` | No | `./data` | Default directory for looking up datasets. |
+| `OUTPUT_DIR` | No | `./output` | Default directory for generated reports. |
+| `THEME_DIR` | No | `./themes` | Directory for custom theme definitions (`.yaml`). |
+| `TEMPLATE_DIR` | No | `./templates` | Directory for custom report templates (`.yaml`). |
+| `GOOGLE_APPLICATION_CREDENTIALS` | No | - | Path to Google Service Account JSON (for Sheets/Docs ingestion). |
+| `OPENAI_API_KEY` | No | - | API Key for AI-driven summaries/insights (if enabled). |
+| `ANTHROPIC_API_KEY` | No | - | API Key for Claude-based AI features. |
 
-## Configuration Files
+### Example `.env` File
 
-The primary configuration is handled via YAML files that define report structure, data sources, and themes.
+Create a file named `.env` in your project root:
 
-### `config.yaml` Example
+```ini
+LOG_LEVEL=DEBUG
+DATA_DIR=./my_data
+OUTPUT_DIR=./reports
+GOOGLE_APPLICATION_CREDENTIALS=certs/google-service-account.json
+```
+
+## Configuration Files (`config.yaml`)
+
+Reports are typically built using a run configuration file.
 
 ```yaml
-project:
-  name: "Quarterly Analysis"
-  version: "1.0.0"
+# config.yaml
+job_name: "monthly_sales_q1"
+template: "sales_report_v1"
+theme: "corporate_blue"
 
-inputs:
-  - type: "csv"
-    path: "data/raw/sales_q1.csv"
-  - type: "google_sheet"
-    id: "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+datasets:
+  sales_data: "./data/q1_sales.csv"
+  targets: "./data/targets_2023.json"
 
 output:
-  format: "markdown"
-  template: "executive_summary"
-  theme: "corporate_dark"
+  format: ["html", "pdf"]
+  filename: "Q1_Sales_Report"
 ```
 
 ## Secrets Management
 
 > [!WARNING]
-> NEVER commit `.env` files or credentials to version control.
+> **NEVER commit secrets to version control.**
 
-*   Use `.env.example` as a template for required variables but keep actual values in `.env`.
-*   The `.gitignore` file is pre-configured to exclude `.env` and `*.key`.
-*   For Google Integrations, ensure your `service-account.json` is also git-ignored.
-
-## Data Directory Setup
-
-The application expects a standardized directory structure, which can be initialized via CLI:
-
-```bash
-report init
-```
-
-This creates:
-*   `data/raw/`: Place your input files here.
-*   `data/processed/`: System-generated normalized files.
-*   `data/reports/`: Generated output location.
+*   **API Keys**: Use environment variables (`OPENAI_API_KEY`).
+*   **Service Accounts**: parameters pointing to file paths (like `GOOGLE_APPLICATION_CREDENTIALS`) should reference files that are listed in `.gitignore`.
+*   **CI/CD**: inject these variables via GitHub Secrets or similar vault mechanisms.

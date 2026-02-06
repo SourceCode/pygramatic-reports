@@ -6,6 +6,7 @@ Defines the typed models for template and theme YAML files.
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -39,6 +40,9 @@ class TemplateSectionSpec(BaseModel):
         title: Section heading.
         level: Heading level.
         condition: Jinja2 condition for conditional rendering.
+        page_break_before: Force page break before section.
+        page_break_after: Force page break after section.
+        orientation: Page orientation for section (portrait/landscape).
     """
 
     model_config = ConfigDict(frozen=True)
@@ -66,6 +70,33 @@ class TemplateSectionSpec(BaseModel):
     level: int = 2
     condition: str | None = None
 
+    # Phase 2 Layout Control
+    page_break_before: bool = False
+    page_break_after: bool = False
+    orientation: str | None = None
+
+    # Phase 3 Content
+    items: list[str] | None = None  # For static lists
+    callout_type: str | None = None  # info, warning, success, danger
+    metric: dict[str, Any] | None = None  # For metric cards
+    columns_spec: list[TemplateSectionSpec] | None = (
+        None  # For multi-column layouts - renamed to avoid conflict
+    )
+    code: str | None = None
+    language: str | None = None
+    quote_author: str | None = None
+
+    # Phase 5 Data Processing
+    filters: list[dict[str, Any]] | None = None
+    sort: list[str] | None = None
+    limit: int | None = None
+    group_by: list[str] | None = None
+    aggregations: dict[str, str] | None = None
+    calculated_columns: dict[str, str] | None = None
+    joins: list[dict[str, Any]] | None = None
+    validation_rules: list[dict[str, Any]] | None = None
+    show_totals: bool = False
+
 
 class TemplateSpec(BaseModel):
     """Full template specification loaded from YAML.
@@ -75,6 +106,11 @@ class TemplateSpec(BaseModel):
         description: Template description.
         version: Template version.
         sections: Ordered list of section specifications.
+        metadata: Default document metadata.
+        cover_page: Cover page configuration.
+        page_layout: Page layout configuration.
+        header: Page header configuration.
+        footer: Page footer configuration.
     """
 
     model_config = ConfigDict(frozen=True)
@@ -82,7 +118,15 @@ class TemplateSpec(BaseModel):
     name: str
     description: str | None = None
     version: str = "1.0"
+    extends: str | None = None  # Parent template name
     sections: list[TemplateSectionSpec]
+
+    # Phase 2 Enhancements
+    metadata: dict[str, Any] | None = None
+    cover_page: dict[str, Any] | None = None
+    page_layout: dict[str, Any] | None = None
+    header: dict[str, Any] | None = None
+    footer: dict[str, Any] | None = None
 
 
 # --- Theme Models ---
@@ -187,6 +231,20 @@ class ChartThemeSpec(BaseModel):
     tick_size: int = 9
     legend_size: int = 10
     line_width: float = 2.0
+    axis_line_color: str = "#333333"
+    axis_line_width: float = 1.0
+    tick_color: str = "#333333"
+    tick_length: float = 4.0
+    data_label_size: int = 9
+    data_label_color: str = "#2c3e50"
+    annotation_color: str = "#e74c3c"
+    secondary_palette: list[str] = [
+        "#95a5a6",
+        "#7f8c8d",
+        "#d35400",
+        "#c0392b",
+        "#bdc3c7",
+    ]
 
 
 class ThemeSpec(BaseModel):

@@ -1,53 +1,50 @@
-# Data Schema
+# Data Schema & Models
 
-Pygramattic Reports uses a strict internal schema to ensure consistency across all data sources. All inputs are converted to Pydantic models upon ingestion.
+Pygramattic Reports uses Pydantic specifically to enforce strict schemas for configuration and internal data structures.
 
-## Core Models
+## Core Entities
 
-### `Dataset`
-The primary unit of data storage.
+### Dataset
+The fundamental unit of data.
 
-| Field | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `UUID` | Yes | Unique identifier for the dataset. |
-| `name` | `str` | Yes | Human-readable name. |
-| `created_at` | `datetime` | Yes | Ingestion timestamp. |
-| `source` | `str` | Yes | Origin of the data (e.g., "sales.csv"). |
-| `schema` | `Dict[str, str]` | Yes | Column names and their data types. |
-| `rows` | `List[Dict]` | Yes | The actual data records. |
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | `str` | Unique identifier (slug). |
+| `dataframe` | `pd.DataFrame` | The actual data (Pandas). |
+| `schema` | `list[ColumnSpec]` | Metadata about columns (name, type, validation rules). |
+| `provenance` | `Provenance` | History of where this data came from and transformations applied. |
 
-### `Report`
-Represents a generated report configuration.
+### TemplateSpec (`.yaml`)
+Defines the structure of a report.
 
-| Field | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `title` | `str` | Yes | Report title. |
-| `template_id` | `str` | Yes | ID of the template used. |
-| `datasets` | `List[UUID]` | Yes | List of Dataset IDs included. |
-| `parameters` | `Dict` | No | Custom parameters passed to the template. |
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `name` | `str` | Internal name of the template. |
+| `extends` | `str?` | Parent template ID. |
+| `sections` | `list[Section]` | Ordered list of content blocks. |
+| `page_layout` | `PageLayout` | Margins, orientation, size. |
 
-### `Manifest`
-Metadata file (`manifest.json`) stored alongside datasets.
+### SectionSpec
+A single block of content.
 
-| Field | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `dataset_id` | `UUID` | Yes | Link to the binary/json file. |
-| `checksum` | `str` | Yes | SHA-256 hash for integrity verification. |
-| `row_count` | `int` | Yes | Total number of records. |
-| `columns` | `List[str]` | Yes | List of column headers. |
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `type` | `str` | `narrative`, `chart`, `data_table`, `callout`, etc. |
+| `source` | `enum` | `static`, `data`, `ai_generated`. |
+| `content` | `str` | Raw text or Jinja2 template. |
+| `dataset` | `str` | Reference to a loaded dataset ID. |
+| `filters` | `list` | Data filtering rules. |
+| `joins` | `list` | Join definitions. |
+| `validation_rules` | `list` | Quality checks (`unique`, `completeness`). |
 
-## Relationships
+### ThemeSpec (`.yaml`)
+Defines the visual style.
 
-```mermaid
-erDiagram
-    DATASET ||--o{ REPORT : includes
-    DATASET ||--|| MANIFEST : described_by
-    REPORT }|--|| TEMPLATE : uses
-    REPORT }|--|| THEME : styled_with
-```
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `colors` | `ColorSpec` | `primary`, `secondary`, `accent`, `background`, `text`. |
+| `fonts` | `FontSpec` | Families and sizes. |
+| `chart` | `ChartTheme` | Matplotlib specific overrides (grid, ticks, spines). |
 
-## Validation
-
-We use Pydantic V2 for high-performance validation.
-*   **Strict Types**: Floats are not automatically coerced to strings unless specified.
-*   **Constraints**: Positive integers are enforced for counts; non-empty strings for names.
+## Database Schema
+*This project is currently stateless and does not maintain a persistent relational database. All state is ephemeral during the build process or persisted as configuration files.*

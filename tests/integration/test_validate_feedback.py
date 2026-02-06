@@ -22,9 +22,7 @@ runner = CliRunner()
 def _ingest_csv(tmp_path: Path) -> tuple[Path, str]:
     """Ingest fixture CSV and return (data_dir, dataset_id)."""
     csv_path = tmp_path / "sales.csv"
-    csv_path.write_text(
-        "region,revenue,cost\nUS,1500,800\nEU,2300,1100\nAPAC,890,500\n"
-    )
+    csv_path.write_text("region,revenue,cost\nUS,1500,800\nEU,2300,1100\nAPAC,890,500\n")
     data_dir = tmp_path / "storage"
     result = runner.invoke(
         app,
@@ -77,9 +75,7 @@ class TestFeedbackProducesRecommendations:
         orig = tmp_path / "report.md"
         edited = tmp_path / "report_edited.md"
         orig.write_text("# Sales Report\n\nDetailed analysis of quarterly revenue.\n")
-        edited.write_text(
-            "# Sales Report\n\nBrief summary.\n\nNew section added.\n"
-        )
+        edited.write_text("# Sales Report\n\nBrief summary.\n\nNew section added.\n")
 
         result = runner.invoke(
             app,
@@ -99,8 +95,11 @@ class TestFeedbackProducesRecommendations:
         result = runner.invoke(
             app,
             [
-                "feedback", str(orig), str(edited),
-                "--output", str(out_json),
+                "feedback",
+                str(orig),
+                str(edited),
+                "--output",
+                str(out_json),
             ],
         )
         assert result.exit_code == 0, result.output
