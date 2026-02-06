@@ -1,0 +1,45 @@
+# Default configuration for pygramattic-reports
+# Override with environment-specific files (e.g., production.yaml)
+# or environment variables (PYGRAMATTIC_*)
+
+environment: development
+
+storage:
+  data_dir: data
+  raw_dir: raw
+  processed_dir: processed
+  derived_dir: derived
+  reports_dir: reports
+  media_dir: media
+
+database:
+  host: localhost
+  port: 5432
+  database: ""
+  schema_name: public
+  read_only: true
+
+claude:
+  enabled: true
+  executable: claude
+  timeout_seconds: 120
+  max_retries: 3
+  retry_backoff_factor: 2.0
+  default_max_tokens: 1024
+
+charts:
+  default_renderer: matplotlib
+  default_format: png
+  default_dpi: 150
+  default_width: 800
+  default_height: 600
+  matplotlib_backend: Agg
+
+logging:
+  level: INFO
+  format: text
+  log_file: null
+  log_ai_interactions: false
+
+templates_dir: sample_templates
+themes_dir: sample_themes

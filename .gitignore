@@ -1,0 +1,52 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Testing & coverage
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Environment & secrets
+.env
+.env.*
+*.log
+credentials.json
+token.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Data directories (tracked structure, not contents)
+data/raw/*
+data/processed/*
+data/derived/*
+data/reports/*
+data/media/*
+!data/**/.gitkeep

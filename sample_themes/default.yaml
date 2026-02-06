@@ -1,0 +1,44 @@
+name: default
+description: Clean, professional default theme
+
+fonts:
+  heading: Arial
+  body: Calibri
+  monospace: Courier New
+  size_title: 24
+  size_heading: 16
+  size_body: 11
+  size_caption: 9
+
+colors:
+  primary: "#2c3e50"
+  secondary: "#3498db"
+  accent: "#e74c3c"
+  background: "#ffffff"
+  text: "#2c3e50"
+  text_light: "#7f8c8d"
+  chart_palette:
+    - "#2c3e50"
+    - "#3498db"
+    - "#2ecc71"
+    - "#e74c3c"
+    - "#f39c12"
+    - "#9b59b6"
+    - "#1abc9c"
+    - "#e67e22"
+
+spacing:
+  section_gap_pt: 18
+  paragraph_gap_pt: 6
+  page_margin_inches: 1.0
+
+chart:
+  background_color: "#ffffff"
+  grid: true
+  grid_color: "#ecf0f1"
+  grid_alpha: 0.7
+  title_size: 14
+  label_size: 11
+  tick_size: 9
+  legend_size: 10
+  line_width: 2.0

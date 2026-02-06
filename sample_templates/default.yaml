@@ -1,0 +1,40 @@
+name: default
+description: A simple default report template suitable for any single dataset
+version: "1.0"
+
+sections:
+  - type: title
+    source: static
+    content: "{{ report_title }}"
+
+  - type: summary
+    source: ai_generated
+    title: "Executive Summary"
+    ai_prompt: >
+      Write a brief executive summary (2-3 paragraphs) of the data in
+      the dataset "{{ dataset_name }}". Focus on key trends, notable
+      values, and overall patterns. Use a professional but accessible
+      tone at a high-school freshman reading level.
+    ai_max_words: 200
+
+  - type: data_table
+    source: data
+    title: "Data Overview"
+    dataset: "{{ primary_dataset }}"
+
+  - type: chart
+    source: chart
+    title: "Visualization"
+    dataset: "{{ primary_dataset }}"
+    chart_type: bar
+    x_column: "{{ x_column }}"
+    y_columns: ["{{ y_column }}"]
+
+  - type: narrative
+    source: ai_generated
+    title: "Analysis"
+    ai_prompt: >
+      Analyze the key findings from the dataset "{{ dataset_name }}".
+      Highlight important trends, outliers, and actionable insights.
+      Keep the language clear and concise.
+    ai_max_words: 300

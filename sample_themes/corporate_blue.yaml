@@ -1,0 +1,44 @@
+name: corporate_blue
+description: Professional corporate theme with blue tones
+
+fonts:
+  heading: Arial
+  body: Calibri
+  monospace: Consolas
+  size_title: 28
+  size_heading: 18
+  size_body: 11
+  size_caption: 9
+
+colors:
+  primary: "#1a5276"
+  secondary: "#2e86c1"
+  accent: "#d4ac0d"
+  background: "#ffffff"
+  text: "#1c2833"
+  text_light: "#566573"
+  chart_palette:
+    - "#1a5276"
+    - "#2e86c1"
+    - "#85c1e9"
+    - "#d4ac0d"
+    - "#1e8449"
+    - "#a93226"
+    - "#7d3c98"
+    - "#f39c12"
+
+spacing:
+  section_gap_pt: 24
+  paragraph_gap_pt: 8
+  page_margin_inches: 1.0
+
+chart:
+  background_color: "#fafafa"
+  grid: true
+  grid_color: "#d5dbdb"
+  grid_alpha: 0.5
+  title_size: 16
+  label_size: 12
+  tick_size: 10
+  legend_size: 11
+  line_width: 2.5

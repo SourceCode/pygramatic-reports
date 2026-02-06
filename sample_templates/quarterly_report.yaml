@@ -1,0 +1,66 @@
+name: quarterly_report
+description: Quarterly business report with revenue, growth, and regional breakdown
+version: "1.0"
+
+sections:
+  - type: title
+    source: static
+    content: "{{ report_title }}"
+
+  - type: heading
+    source: static
+    content: "Report Period: {{ report_period }}"
+    level: 2
+
+  - type: summary
+    source: ai_generated
+    title: "Executive Summary"
+    ai_prompt: >
+      Write a concise executive summary of the quarterly performance data.
+      Cover overall revenue, growth trends, and regional highlights.
+      Keep it to 2-3 paragraphs at a high-school freshman reading level.
+    ai_max_words: 200
+
+  - type: data_table
+    source: data
+    title: "Revenue by Region"
+    dataset: main_data
+
+  - type: chart
+    source: chart
+    title: "Revenue Distribution"
+    dataset: main_data
+    chart_type: bar
+    x_column: region
+    y_columns: ["revenue"]
+
+  - type: chart
+    source: chart
+    title: "Growth Trends"
+    dataset: main_data
+    chart_type: line
+    x_column: quarter
+    y_columns: ["growth_pct"]
+    condition: "'growth_pct' in dataset_columns"
+
+  - type: narrative
+    source: ai_generated
+    title: "Detailed Analysis"
+    ai_prompt: >
+      Provide a detailed analysis of the quarterly data. Discuss regional
+      performance differences, growth trajectory, and any concerning trends.
+      Suggest areas for investigation. Professional tone, clear language.
+    ai_max_words: 400
+
+  - type: page_break
+    source: static
+
+  - type: heading
+    source: static
+    content: "Appendix"
+    level: 2
+
+  - type: data_table
+    source: data
+    title: "Full Dataset"
+    dataset: main_data

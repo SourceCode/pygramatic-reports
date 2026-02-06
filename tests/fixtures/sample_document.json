@@ -1,0 +1,22 @@
+{
+    "title": "Quarterly Report",
+    "author": "Analytics Team",
+    "sections": [
+        {
+            "heading": "Executive Summary",
+            "content": "Revenue grew 12% year-over-year."
+        },
+        {
+            "heading": "Regional Breakdown",
+            "content": "US leads with $1.5M in Q1 revenue.",
+            "subsections": [
+                {"region": "US", "revenue": 1500000},
+                {"region": "EU", "revenue": 2300000}
+            ]
+        }
+    ],
+    "metadata": {
+        "generated": "2024-07-01",
+        "version": 2
+    }
+}

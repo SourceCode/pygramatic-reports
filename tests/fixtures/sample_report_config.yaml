@@ -1,0 +1,13 @@
+report_name: "Sample Sales Report"
+template: default
+theme: default
+
+datasets:
+  main: "<dataset_id_placeholder>"
+
+primary_dataset: main
+
+output_formats:
+  - md
+
+ai_enabled: false

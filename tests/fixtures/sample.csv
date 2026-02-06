@@ -1,0 +1,6 @@
+region,revenue,quarter,growth_pct,is_active
+US,1500.50,Q1,12.5,true
+EU,2300.75,Q1,8.3,true
+APAC,890.25,Q1,-2.1,false
+US,1650.00,Q2,10.0,true
+EU,2500.00,Q2,8.7,true
