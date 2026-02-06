@@ -5,4 +5,4 @@ processes it, and generates consistent, validated, and well-styled reports
 across multiple output formats.
 """
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
