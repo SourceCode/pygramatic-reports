@@ -58,3 +58,31 @@ class LoaderRegistry:
     def available_types(self) -> list[str]:
         """List all registered source types."""
         return list(self._loaders.keys())
+
+
+def create_default_loader_registry() -> LoaderRegistry:
+    """Create a registry pre-loaded with built-in loaders.
+
+    Returns:
+        Registry with csv, json, xlsx, docx, md, txt, parquet, yaml loaders.
+    """
+    from .csv_loader import CsvLoader  # noqa: PLC0415
+    from .docx_loader import DocxLoader  # noqa: PLC0415
+    from .json_loader import JsonLoader  # noqa: PLC0415
+    from .md_loader import MdLoader  # noqa: PLC0415
+    from .parquet_loader import ParquetLoader  # noqa: PLC0415
+    from .txt_loader import TxtLoader  # noqa: PLC0415
+    from .xlsx_loader import XlsxLoader  # noqa: PLC0415
+    from .yaml_loader import YamlLoader  # noqa: PLC0415
+
+    registry = LoaderRegistry()
+    registry.register(CsvLoader())
+    registry.register(JsonLoader())
+    registry.register(XlsxLoader())
+    registry.register(DocxLoader())
+    registry.register(MdLoader())
+    registry.register(TxtLoader())
+    registry.register(ParquetLoader())
+    registry.register(YamlLoader())
+
+    return registry

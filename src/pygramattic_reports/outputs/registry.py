@@ -67,10 +67,12 @@ def create_default_output_registry() -> OutputRegistry:
     """Create a registry pre-loaded with all built-in adapters.
 
     Returns:
-        Registry with ``md``, ``markdown``, ``docx``, and ``xlsx``
-        adapters registered.
+        Registry with ``md``, ``markdown``, ``docx``, ``xlsx``,
+        ``html``, and ``json`` adapters registered.
     """
     from .docx_adapter import DocxAdapter  # noqa: PLC0415
+    from .html_adapter import HtmlAdapter  # noqa: PLC0415
+    from .json_adapter import JsonAdapter  # noqa: PLC0415
     from .markdown_adapter import MarkdownAdapter  # noqa: PLC0415
     from .xlsx_adapter import XlsxAdapter  # noqa: PLC0415
 
@@ -79,4 +81,6 @@ def create_default_output_registry() -> OutputRegistry:
     registry.register("markdown", MarkdownAdapter())
     registry.register("docx", DocxAdapter())
     registry.register("xlsx", XlsxAdapter())
+    registry.register("html", HtmlAdapter())
+    registry.register("json", JsonAdapter())
     return registry

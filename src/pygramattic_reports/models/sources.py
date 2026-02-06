@@ -25,6 +25,8 @@ class SourceType(StrEnum):
     GSHEET = "gsheet"
     GSLIDES = "gslides"
     POSTGRESQL = "postgresql"
+    PARQUET = "parquet"
+    YAML = "yaml"
 
 
 class FileSourceConfig(BaseModel):

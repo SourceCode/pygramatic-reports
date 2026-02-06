@@ -1,5 +1,116 @@
 # AGENTS.md
 
+## 🤖 AI Agent Usage Guide
+
+This section is strictly for AI agents to understand how to effectively work within this repository.
+
+### 1. Project Architecture
+
+```mermaid
+graph TD
+    CLI[CLI (Typer)] --> Config[AppConfig (Pydantic)]
+    Config --> Storage[Storage Engine]
+    
+    CLI --> Ingest[Ingestion]
+    Ingest --> RawData[(Raw Data)]
+    RawData --> Normalize[Normalization]
+    Normalize --> Processed[(Processed Data)]
+    
+    Processed --> Build[Builder Engine]
+    Templates[Jinja2 Templates] --> Build
+    Themes[Themes] --> Build
+    
+    Build --> ReportObj[Report Object]
+    ReportObj --> Validate[Validator]
+    Validate --> Output[Output Adapters]
+    
+    Output --> Markdown[Markdown]
+    Output --> PDF[PDF/DOCX]
+    Output --> HTML[HTML]
+```
+
+### 2. Agent Quick Actions
+
+Run these commands to verify your work.
+
+**Environment Setup**
+```bash
+./scripts/agent_setup.sh
+```
+
+**Dump Configuration Schema**
+```bash
+python3 scripts/dump_schema.py
+```
+
+**Run Tests**
+```bash
+pytest tests/
+```
+
+**Lint & Format**
+```bash
+ruff check .
+ruff format .
+```
+
+**Type Check**
+```bash
+mypy .
+```
+
+### 3. Verification Protocol (MANDATORY)
+
+Before submitting any code changes, you **MUST** pass this checklist:
+
+1.  [ ] **Linting**: No errors from `ruff check src`.
+2.  [ ] **Type Safety**: No errors from `mypy src`.
+3.  [ ] **Tests**: All tests pass (`pytest`). New logic must have new tests.
+4.  [ ] **Schema**: If you changed models, verify `python3 scripts/dump_schema.py` still works.
+5.  [ ] **Documentation**: Update docstrings for any modified functions.
+
+### 4. Troubleshooting Guide
+
+| Error Code | Context | Fix |
+| :--- | :--- | :--- |
+| `pydantic.ValidationError` | Runtime | Ensure input data matches strict schema types. |
+| `F401` | Ruff | Remove unused imports. |
+| `ANN101` | Ruff | Add missing type hints to function arguments (self, cls excluded). |
+| `ModuleNotFoundError` | Python | Run `./scripts/agent_setup.sh` to install deps. |
+| `mypy: Call to untyped function` | Mypy | Add type stubs or cast to known type if external lib is untyped. |
+
+### 5. Project Map
+
+```text
+/
+├── configs/          # Runtime configurations (YAML)
+├── data/             # Data storage (Git-ignored)
+├── docs/             # User documentation
+├── scripts/          # Helper scripts for Agents
+│   ├── agent_setup.sh
+│   └── dump_schema.py
+├── src/
+│   └── pygramattic_reports/
+│       ├── cli/      # Typer CLI commands
+│       ├── config/   # Pydantic settings
+│       ├── models/   # Core data models
+│       ├── loaders/  # Input file parsers
+│       └── ...
+├── tests/            # Pytest suite
+├── pyproject.toml    # Dependencies & Tool Config
+└── AGENTS.md         # YOU ARE HERE
+```
+
+### 6. Contribution Rules
+
+1.  **Strict Typing**: usage of `Any` is discouraged. Use specific types.
+2.  **No Magic Numbers**: Define constants for literals.
+3.  **Docstrings**: Google-style docstrings are required for all public members.
+4.  **PathLib**: Use `pathlib.Path` instead of `os.path`.
+5.  **Exceptions**: Define custom exceptions in `src/pygramattic_reports/exceptions.py`.
+
+---
+
 ## Technical Reference: Pygramattic Reports
 
 ### Capabilities Mapping

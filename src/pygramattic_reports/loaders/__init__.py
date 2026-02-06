@@ -13,9 +13,11 @@ from .csv_loader import CsvLoader
 from .docx_loader import DocxLoader
 from .json_loader import JsonLoader
 from .md_loader import MdLoader
+from .parquet_loader import ParquetLoader
 from .registry import LoaderRegistry
 from .txt_loader import TxtLoader
 from .xlsx_loader import XlsxLoader
+from .yaml_loader import YamlLoader
 
 
 def create_default_registry() -> LoaderRegistry:
@@ -27,6 +29,8 @@ def create_default_registry() -> LoaderRegistry:
     registry.register(DocxLoader())
     registry.register(TxtLoader())
     registry.register(MdLoader())
+    registry.register(ParquetLoader())
+    registry.register(YamlLoader())
     return registry
 
 
@@ -36,7 +40,9 @@ __all__ = [
     "JsonLoader",
     "LoaderRegistry",
     "MdLoader",
+    "ParquetLoader",
     "TxtLoader",
     "XlsxLoader",
+    "YamlLoader",
     "create_default_registry",
 ]
